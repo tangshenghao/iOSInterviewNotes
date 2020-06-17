@@ -1,0 +1,40 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+<title>JS测试</title>
+</head>
+<body>
+<div>
+按钮，点击调用原生方法
+</div>
+<button onclick = "doSomeThing()" style = "font-size: 18px;">1、通过链接拦截法-调用原生</button>
+<button onclick = "doSomeThing1()" style = "font-size: 18px;">2、通过JavaScriptCore法-调用原生</button>
+<button onclick = "doSomeThing2()" style = "font-size: 18px;">3、通过JSExport法-调用原生</button>
+<div>
+接收到原生的数据：
+</div>
+<div id = "oc2js1" style = "font-size: 18px; border: 1px solid; height: 50px;"></div>
+<script>
+	function doSomeThing() {
+  		var url = "jsToOC://xxxx?aaaa=bbbb";
+  		window.location.href = url;
+	}
+
+    function ocToJS(action, params) {
+        document.getElementById("oc2js1").innerHTML = action + '===' + params;
+    }
+
+    function doSomeThing1() {
+        //使用window调用和不使用都可以
+        var result = window.JSToOC2("aaaaa", "bbbbbb");
+        console.log(result);
+    }
+
+    function doSomeThing2() {
+        //使用window调用和不使用都可以
+        var result = OCJSBridge.jSToOC3("aaaaa", "bbbbbb");
+        console.log(result);
+    }
+</script>
+</body>
+</html>
