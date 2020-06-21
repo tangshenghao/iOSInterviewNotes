@@ -10,8 +10,8 @@ class Solution {
                 num >>= 1
             }
         }
-            var res = 0, m = 3
-            for i in 0..<32 {
+        var res = 0, m = 3
+        for i in 0..<32 {
             res <<= 1
             res |= counts[31 - i] % m
         }
