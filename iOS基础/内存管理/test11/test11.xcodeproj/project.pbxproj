@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5E232F1C24A1D0EC006AB8B7 /* SecondViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E232F1B24A1D0EC006AB8B7 /* SecondViewController.m */; };
 		5EF2FD6424A10E1B00F3B7C4 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 5EF2FD6324A10E1B00F3B7C4 /* AppDelegate.m */; };
 		5EF2FD6724A10E1B00F3B7C4 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 5EF2FD6624A10E1B00F3B7C4 /* SceneDelegate.m */; };
 		5EF2FD6A24A10E1B00F3B7C4 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5EF2FD6924A10E1B00F3B7C4 /* ViewController.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -18,6 +19,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		5E232F1A24A1D0EC006AB8B7 /* SecondViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SecondViewController.h; sourceTree = "<group>"; };
+		5E232F1B24A1D0EC006AB8B7 /* SecondViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SecondViewController.m; sourceTree = "<group>"; };
 		5EF2FD5F24A10E1B00F3B7C4 /* test11.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = test11.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5EF2FD6224A10E1B00F3B7C4 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		5EF2FD6324A10E1B00F3B7C4 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -70,6 +73,8 @@
 				5EF2FD6624A10E1B00F3B7C4 /* SceneDelegate.m */,
 				5EF2FD6824A10E1B00F3B7C4 /* ViewController.h */,
 				5EF2FD6924A10E1B00F3B7C4 /* ViewController.m */,
+				5E232F1A24A1D0EC006AB8B7 /* SecondViewController.h */,
+				5E232F1B24A1D0EC006AB8B7 /* SecondViewController.m */,
 				5EF2FD7B24A1121900F3B7C4 /* TestObject.h */,
 				5EF2FD7C24A1121900F3B7C4 /* TestObject.m */,
 				5EF2FD6B24A10E1B00F3B7C4 /* Main.storyboard */,
@@ -151,6 +156,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5E232F1C24A1D0EC006AB8B7 /* SecondViewController.m in Sources */,
 				5EF2FD6A24A10E1B00F3B7C4 /* ViewController.m in Sources */,
 				5EF2FD6424A10E1B00F3B7C4 /* AppDelegate.m in Sources */,
 				5EF2FD7D24A1121900F3B7C4 /* TestObject.m in Sources */,
