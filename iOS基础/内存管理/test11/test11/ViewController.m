@@ -72,6 +72,7 @@
 - (IBAction)toNextVC:(id)sender {
     SecondViewController *vc = [[SecondViewController alloc] init];
     [self presentViewController:vc animated:YES completion:nil];
+    [vc autorelease];
 }
 
 
