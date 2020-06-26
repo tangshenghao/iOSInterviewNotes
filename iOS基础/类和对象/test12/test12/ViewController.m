@@ -8,6 +8,7 @@
 
 #import "ViewController.h"
 #import "TestObject.h"
+#import <objc/runtime.h>
 
 @interface ViewController ()
 
@@ -29,6 +30,16 @@
     Class testClass2 = [test1 class];
     
     NSLog(@"testClass1 : %p , testClass2 : %p", testClass1, testClass2);
+    
+    Class testClass3 = object_getClass(test1);
+    Class testClass4 = object_getClass(testClass1);
+    
+    NSLog(@"testClass3 : %p , testClass4 : %p", testClass3, testClass4);
+    
+    BOOL isMetaClass1 = class_isMetaClass(testClass3);
+    BOOL isMetaClass2 = class_isMetaClass(testClass4);
+    
+    NSLog(@"isMetaClass1 : %d , isMetaClass2 : %d", isMetaClass1, isMetaClass2);
     
 }
 
