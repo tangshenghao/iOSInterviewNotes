@@ -21,17 +21,18 @@ iOS面试的准备、知识点的积累
 ## iOS基础
 
 * [内存管理](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/iOS%E5%9F%BA%E7%A1%80/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86.md)
+* 类和对象
 * 属性
-* 多线程
-* 锁
 * runtime
+* 消息发送
 * runloop
-* 消息转发
-* 响应链
 * block
 * KVC
 * KVO
 * category与extension
+* 多线程
+* 锁
+* 响应链
 * WKWebView
 
 ## 网络基础

@@ -177,10 +177,30 @@ int pthread_setspecific(pthread_key_t , const void *);
 
 
 
-#### 1.4 总结
+#### 1.4 ARC和MRC下的不用
+
+调用的方式不通同，代码如下：
+
+```
+// MRC 
+NSAutoreleasePool *pool = [NSAutoreleasePool alloc] init]; 
+id obj = [NSObject alloc] init]; 
+[obj autorelease]; 
+[pool drain];
+
+// ARC 
+@autoreleasepool { 
+   id obj = [NSObject alloc] init]; 
+} 	
+```
+
+
+
+#### 1.5 总结
 
 通常的ARC情况下，我们是不需要手动添加autoreleasepool的，使用的是线程自动维护的autoreleasepool就好，在以下三种情况需要添加autoreleasepool：
 
 1. 如果你编写的程序不是UI框架的，而是命令行工具。
 2. 如果你编写的循环中创建了大量的临时对象。
 3. 如果你创建了一个辅助线程。
+
