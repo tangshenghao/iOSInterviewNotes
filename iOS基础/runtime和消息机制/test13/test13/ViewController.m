@@ -20,8 +20,8 @@
     // Do any additional setup after loading the view.
     
     TestObject *test = [[TestObject alloc] init];
-    [test performSelector:@selector(logTest)];
-    
+//    [test performSelector:@selector(logTest)];
+
     [TestObject performSelector:@selector(logTest)];
     
 }

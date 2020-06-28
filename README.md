@@ -23,7 +23,7 @@ iOS面试的准备、知识点的积累
 * [内存管理](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/iOS%E5%9F%BA%E7%A1%80/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86.md)
 * [类和对象](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/iOS%E5%9F%BA%E7%A1%80/%E7%B1%BB%E5%92%8C%E5%AF%B9%E8%B1%A1/%E7%B1%BB%E5%92%8C%E5%AF%B9%E8%B1%A1.md)
 * [属性](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/iOS%E5%9F%BA%E7%A1%80/%E5%B1%9E%E6%80%A7/%E5%B1%9E%E6%80%A7.md)
-* runtime和消息机制
+* [runtime和消息机制](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/iOS%E5%9F%BA%E7%A1%80/runtime%E5%92%8C%E6%B6%88%E6%81%AF%E6%9C%BA%E5%88%B6/runtime%E5%92%8C%E6%B6%88%E6%81%AF%E6%9C%BA%E5%88%B6.md)
 * runloop
 * block
 * KVC

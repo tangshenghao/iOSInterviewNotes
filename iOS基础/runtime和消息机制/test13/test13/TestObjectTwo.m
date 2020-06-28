@@ -10,9 +10,12 @@
 
 @implementation TestObjectTwo
 
-// 消息转发第二步 Fast forwarding 快速转发阶段
-- (id)forwardingTargetForSelector:(SEL)aSelector {
-    return [super forwardingTargetForSelector:aSelector];
+- (void)logTest {
+    NSLog(@"TestObjectTwo 中的logTest");
+}
+
++ (void)logTest {
+    NSLog(@"TestObjectTwo 中的Class logTest");
 }
 
 @end

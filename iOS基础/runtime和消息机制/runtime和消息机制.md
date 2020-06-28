@@ -132,15 +132,17 @@ IMP实际上是一个指针，指向方法的实现函数。通过IMP找到函�
 
 消息转发机制如下图所示：
 
-
+![[https://github.com/tangshenghao/iOSInterviewNotes/blob/master/iOS%E5%9F%BA%E7%A1%80/runtime%E5%92%8C%E6%B6%88%E6%81%AF%E6%9C%BA%E5%88%B6/%E6%B6%88%E6%81%AF%E8%BD%AC%E5%8F%91.jpeg](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/iOS基础/runtime和消息机制/消息转发.jpeg)]()
 
 从图中来看，主要分为3大步骤：
 
 1. Method resolution 方法解析阶段
 2. fast forwarding 快速转发阶段
-3. Normal forwarding 常规转发转发阶段
+3. Normal forwarding 常规转发阶段
 
 当类和父类都找不到对应SEL时，为了不发生unrecognized selector 的错误，需要使用上述三种方式进行消息发送的补救。
+
+
 
 **Method resolution 方法解析阶段**
 
@@ -218,5 +220,99 @@ void dynamicMethodIMP(id self, SEL _cmd) {
 
 调用的是- (id)forwardingTargetForSelector:(SEL)aSelector。
 
+在NSObject的源码中快速转发的方法返回的都是nil。
+
 创建一个别的类来实现响应对应的方法。
+
+然后实现对应的方法复写，代码如下：
+
+```
+// 消息转发第二步 Fast forwarding 快速转发阶段
+- (id)forwardingTargetForSelector:(SEL)aSelector {
+    if ([NSStringFromSelector(aSelector) isEqualToString:@"logTest"]) {
+        Class TestObjectTwo = NSClassFromString(@"TestObjectTwo");
+        //返回实例对象
+        return [[TestObjectTwo alloc] init];
+    }
+    
+    return [super forwardingTargetForSelector:aSelector];
+}
+```
+
+如果是类方法，代码如下：
+
+```
++ (id)forwardingTargetForSelector:(SEL)aSelector {
+    if ([NSStringFromSelector(aSelector) isEqualToString:@"logTest"]) {
+        Class TestObjectTwo = NSClassFromString(@"TestObjectTwo");
+        //返回类对象
+        return TestObjectTwo;
+    }
+    
+    return [super forwardingTargetForSelector:aSelector];
+}
+```
+
+使用这个特性，可以做一些解耦或者循环引用的问题，例如，NSTimer导致循环引用的问题。
+
+
+
+**Normal Forwarding 常规转发阶段**
+
+如果第二步返回self或者nil，则找不到可以响应的对象去执行。接下来进入第三步。
+
+第三步的消息转发机制，本质上跟第二步是一样的，都是切换接受消息的对象。但第三步切换响应目标更复杂一些，第二步只需要返回可以响应的对象即可，第三步还需要手动将响应方法切换给备用响应对象。
+
+第三步有2个步骤
+
+- methodSignatureForSelector
+- forwardInvocation
+
+methodSignatureForSelector中，返回SEL方法的签名，返回的签名是根据方法的参数来封装的。
+
+手动创建签名，但是尽量少使用，因为容易创建错误。
+
+代码如下，先实现methodSignatureForSelector
+
+```
+// 3.1 先创建签名标签
+- (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector {
+    //写法例子
+    //例子"v@:@"
+    //v@:@ v 返回值类型void;@ id类型,执行sel的对象;: SEL;@ 参数
+    //例子"@@:"
+    //@ 返回值类型id;@ id类型,执行sel的对象;: SEL
+    
+    if ([super methodSignatureForSelector:aSelector] == nil) {
+        NSMethodSignature *sign = [NSMethodSignature signatureWithObjCTypes:"v@:"];
+        return sign;
+    }
+    
+    return [super methodSignatureForSelector:aSelector];
+}
+```
+
+然后再实现forwardInvocation
+
+```
+// 执行消息转发调用
+- (void)forwardInvocation:(NSInvocation *)anInvocation {
+    //创建备用对象
+    Class TestObjectTwo = NSClassFromString(@"TestObjectTwo");
+    id testObjectTwo = [[TestObjectTwo alloc] init];
+    SEL sel = anInvocation.selector;
+    
+    if ([TestObjectTwo respondsToSelector:sel]) {
+        [anInvocation invokeWithTarget:testObjectTwo];
+    } else {
+        [self doesNotRecognizeSelector:sel];
+    }
+}
+```
+
+类方法转发，只需要将-变成+，然后forwardInvocation中的target使用Class。
+
+以上就是消息转发机制，转发过程越早越好，第一步实现添加后，runtime会缓存到方法缓存里面，下次再调用可以提高效率。后续得每次都得进行代码查找调用。最后一步需要处理完整的NSInvocation。
+
+消息转发可以动态添加部分方法。可以实现多重代理，不不同的对象同时代理同个毁掉，然后再各自负责的区域进行相应的处理，降低代码耦合。以及简洁实现多即成。
 
