@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		5E6693C024AA450F0046C039 /* UIViewController+Swizzling.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E6693BF24AA450F0046C039 /* UIViewController+Swizzling.m */; };
+		5E6693C324AA4AF80046C039 /* NSObject+JSONExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E6693C224AA4AF80046C039 /* NSObject+JSONExtension.m */; };
+		5E6693C624AA4CBC0046C039 /* TestObjectThree.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E6693C524AA4CBC0046C039 /* TestObjectThree.m */; };
 		5EC567A624A8953B00EB3A17 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 5EC567A524A8953B00EB3A17 /* AppDelegate.m */; };
 		5EC567A924A8953B00EB3A17 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 5EC567A824A8953B00EB3A17 /* SceneDelegate.m */; };
 		5EC567AC24A8953B00EB3A17 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5EC567AB24A8953B00EB3A17 /* ViewController.m */; };
@@ -22,6 +24,10 @@
 /* Begin PBXFileReference section */
 		5E6693BE24AA450F0046C039 /* UIViewController+Swizzling.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIViewController+Swizzling.h"; sourceTree = "<group>"; };
 		5E6693BF24AA450F0046C039 /* UIViewController+Swizzling.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+Swizzling.m"; sourceTree = "<group>"; };
+		5E6693C124AA4AF80046C039 /* NSObject+JSONExtension.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSObject+JSONExtension.h"; sourceTree = "<group>"; };
+		5E6693C224AA4AF80046C039 /* NSObject+JSONExtension.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSObject+JSONExtension.m"; sourceTree = "<group>"; };
+		5E6693C424AA4CBC0046C039 /* TestObjectThree.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TestObjectThree.h; sourceTree = "<group>"; };
+		5E6693C524AA4CBC0046C039 /* TestObjectThree.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestObjectThree.m; sourceTree = "<group>"; };
 		5EC567A124A8953B00EB3A17 /* test13.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = test13.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5EC567A424A8953B00EB3A17 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		5EC567A524A8953B00EB3A17 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -82,6 +88,10 @@
 				5EC567C124A8F42A00EB3A17 /* TestObjectTwo.m */,
 				5E6693BE24AA450F0046C039 /* UIViewController+Swizzling.h */,
 				5E6693BF24AA450F0046C039 /* UIViewController+Swizzling.m */,
+				5E6693C124AA4AF80046C039 /* NSObject+JSONExtension.h */,
+				5E6693C224AA4AF80046C039 /* NSObject+JSONExtension.m */,
+				5E6693C424AA4CBC0046C039 /* TestObjectThree.h */,
+				5E6693C524AA4CBC0046C039 /* TestObjectThree.m */,
 				5EC567AD24A8953B00EB3A17 /* Main.storyboard */,
 				5EC567B024A8953E00EB3A17 /* Assets.xcassets */,
 				5EC567B224A8953E00EB3A17 /* LaunchScreen.storyboard */,
@@ -164,8 +174,10 @@
 				5EC567AC24A8953B00EB3A17 /* ViewController.m in Sources */,
 				5EC567C224A8F42A00EB3A17 /* TestObjectTwo.m in Sources */,
 				5EC567A624A8953B00EB3A17 /* AppDelegate.m in Sources */,
+				5E6693C624AA4CBC0046C039 /* TestObjectThree.m in Sources */,
 				5EC567BF24A8966300EB3A17 /* TestObject.m in Sources */,
 				5EC567B724A8953E00EB3A17 /* main.m in Sources */,
+				5E6693C324AA4AF80046C039 /* NSObject+JSONExtension.m in Sources */,
 				5E6693C024AA450F0046C039 /* UIViewController+Swizzling.m in Sources */,
 				5EC567A924A8953B00EB3A17 /* SceneDelegate.m in Sources */,
 			);
