@@ -132,7 +132,7 @@ IMP实际上是一个指针，指向方法的实现函数。通过IMP找到函�
 
 消息转发机制如下图所示：
 
-![[https://github.com/tangshenghao/iOSInterviewNotes/blob/master/iOS%E5%9F%BA%E7%A1%80/runtime%E5%92%8C%E6%B6%88%E6%81%AF%E6%9C%BA%E5%88%B6/%E6%B6%88%E6%81%AF%E8%BD%AC%E5%8F%91.jpeg](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/iOS基础/runtime和消息机制/消息转发.jpeg)]()
+![](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/iOS%E5%9F%BA%E7%A1%80/runtime%E5%92%8C%E6%B6%88%E6%81%AF%E6%9C%BA%E5%88%B6/%E6%B6%88%E6%81%AF%E8%BD%AC%E5%8F%91.jpeg?raw=true)
 
 从图中来看，主要分为3大步骤：
 
