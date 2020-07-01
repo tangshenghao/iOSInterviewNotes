@@ -74,7 +74,7 @@ struct __CFRunLoopMode {
 
 RunLoop的结构关系如图：
 
-![[https://github.com/tangshenghao/iOSInterviewNotes/blob/master/iOS%E5%9F%BA%E7%A1%80/runloop/runloop%E7%BB%93%E6%9E%84%E5%85%B3%E7%B3%BB.png](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/iOS基础/runloop/runloop结构关系.png)]()
+![[https://raw.githubusercontent.com/tangshenghao/iOSInterviewNotes/master/iOS%E5%9F%BA%E7%A1%80/runloop/runloop%E7%BB%93%E6%9E%84%E5%85%B3%E7%B3%BB.png?token=ABFXVM3MJTG4SZFJ47UHKO267Q7ZM](https://raw.githubusercontent.com/tangshenghao/iOSInterviewNotes/master/iOS基础/runloop/runloop结构关系.png?token=ABFXVM3MJTG4SZFJ47UHKO267Q7ZM)]()
 
 
 
