@@ -393,7 +393,7 @@ dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 });  
 ```
 
-scheduledTimerWithTimeInterval内部在向RunLoop传递Timer时是调用与线程实例相关的单例方法[NSRunLoop currentRunLoop]来获取RunLoop实例，而在RunLoop开始运行后再向其传递Timer时，由于dispatch_async代码块内的两行代码时顺序执行，在run的时候，当前线程的RunLoop并没有对应modeitem，没有通过source0或者timer去注册mach port，runloop不会等待激活，会退出runloop。然后后续在获取再加入runloop时，并没有唤醒runloop。如果再调用一次run就可以激活。
+scheduledTimerWithTimeInterval内部在向RunLoop传递Timer时是调用与线程实例相关的单例方法[NSRunLoop currentRunLoop]来获取RunLoop实例，而在RunLoop开始运行后再向其传递Timer时，由于dispatch_async代码块内的两行代码时顺序执行，[[NSRunLoop currentRunLoop] run];是一个没有结束时间的RunLoop，无法执行到scheduledTimerWithTimeInterval这一行代码，Timer也就没有被加到当前RunLoop中，所以更不会触发Timer。
 
 
 
