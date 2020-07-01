@@ -74,7 +74,7 @@ struct __CFRunLoopMode {
 
 RunLoop的结构关系如图：
 
-![[https://raw.githubusercontent.com/tangshenghao/iOSInterviewNotes/master/iOS%E5%9F%BA%E7%A1%80/runloop/runloop%E7%BB%93%E6%9E%84%E5%85%B3%E7%B3%BB.png?token=ABFXVM3MJTG4SZFJ47UHKO267Q7ZM](https://raw.githubusercontent.com/tangshenghao/iOSInterviewNotes/master/iOS基础/runloop/runloop结构关系.png?token=ABFXVM3MJTG4SZFJ47UHKO267Q7ZM)]()
+![](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/iOS%E5%9F%BA%E7%A1%80/runloop/runloop%E7%BB%93%E6%9E%84%E5%85%B3%E7%B3%BB.png?raw=true)
 
 
 
@@ -155,7 +155,9 @@ timer和source1，可以反复使用，比如timer设置成repeat，port可以�
 
 运行机制如下图：
 
-![[https://github.com/tangshenghao/iOSInterviewNotes/blob/master/iOS%E5%9F%BA%E7%A1%80/runloop/runloop%E8%BF%90%E8%A1%8C%E6%9C%BA%E5%88%B6.png](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/iOS基础/runloop/runloop运行机制.png)]()
+![](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/iOS%E5%9F%BA%E7%A1%80/runloop/runloop%E8%BF%90%E8%A1%8C%E6%9C%BA%E5%88%B6.png?raw=true)
+
+
 
 当调用CFRTunLoopRun()时，线程就会一直停留在这个循环里，直到超时或被手动停止，该函数才会返回。每次线程运行RunLoop都会自动处理之前未处理的消息，并且将消息发送给观察者，让事件得到执行。RunLoop运行时首先根据modeName找到对应mode，如果mode里没有source/timer/observer就会直接返回。
 
@@ -319,7 +321,7 @@ source/timer/observer全都空了 __CFRunLoopModelsEmpty(runloop, currentMode)
 
 为了实现消息的发送和接收，mach_msg()函数实际上是调用了一个Mach陷阱(trap)，即函数mach_msg_trap()，陷阱这个概念在Mach中等同于系统调用。当你在用户态调用mach_msg_trap()时会触发陷阱机制，切换到内核状态。内核态中内核实现的mach_msg()函数会完成实际的工作，如下图：
 
-![]([https://github.com/tangshenghao/iOSInterviewNotes/blob/master/iOS%E5%9F%BA%E7%A1%80/runloop/runloop%E6%B6%88%E6%81%AF%E5%8E%9F%E7%90%86.png](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/iOS基础/runloop/runloop消息原理.png))
+![](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/iOS%E5%9F%BA%E7%A1%80/runloop/runloop%E6%B6%88%E6%81%AF%E5%8E%9F%E7%90%86.png?raw=true)
 
 RunLoop的核心就是一个mach_msg()，RunLoop调用这个函数去接收消息，如果没有别人发送port消息过来，内核会将线程置于等待状态，例如你在模拟器跑一个App，在静止状态点击暂停，你会看到主线程调用的栈停留在mach_msg_trap()这个地方。
 
