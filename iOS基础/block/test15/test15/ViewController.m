@@ -8,7 +8,7 @@
 
 #import "ViewController.h"
 
-typedef int(^Test4Block)(int);
+typedef int(^Test4Block)(int t);
 
 @interface ViewController ()
 
@@ -86,8 +86,31 @@ typedef int(^Test4Block)(int);
     NSLog(@"使用外部变量并且使用__block修饰外部变量：%@， %d", Test7Block, j);
     
     
+    NSLog(@"class = %@, super Class = %@, base Class = %@", [Test7Block class], [[[Test7Block class] superclass] superclass], [[[[Test7Block class] superclass] superclass] superclass]);
+    
+    [self doSomeThing:^int(int t) {
+        NSLog(@"block函数");
+        return 4;
+    }];
+    
+    Test4Block block9 = [self doSomeThing2:4];
+    NSLog(@"result = %d", block9(2));
     
 }
+
+//作为参数调用
+- (void)doSomeThing:(Test4Block)block {
+    NSLog(@"调用了函数:%d", block(3));
+}
+
+//作为返回值调用
+- (Test4Block)doSomeThing2:(int )t {
+    Test4Block block = ^int(int x) {
+        return x + t;
+    };
+    return block;
+}
+
 
 
 @end
