@@ -403,3 +403,70 @@ dispose函数内部会调用_block_object_dispose函数，该函数会自动释�
 
 其实就和引用计数一样，都没有引用时才废弃。
 
+__block中的forwarding指针
+
+```
+struct __Block_byref_test1_0 {
+  void *__isa;
+__Block_byref_test1_0 *__forwarding;
+ int __flags;
+ int __size;
+ void (*__Block_byref_id_object_copy)(void*, void*);
+ void (*__Block_byref_id_object_dispose)(void*);
+ NSObject *__strong test1;
+};
+```
+
+访问的时候，使用test1->__forwarding->test1
+
+```
+NSLog((NSString *)&__NSConstantStringImpl__var_folders_hz_6yv0h07n6mz76tv81_0rmgmr0000gn_T_main_ec5054_mi_0,(test1->__forwarding->test1), (test2->__forwarding->test2), (test3->__forwarding->test3));
+```
+
+为什么不直接使用test1，而是需要通过__forwarding去调用呢？
+
+因为，如果__变量还在栈上，是可以直接访问，但是如果已经拷贝到堆堆上，访问时，还去访问栈上的，就会出问题，所以先根据forwarding找到堆上的地址，然后再去取值，如下图：
+
+
+
+所以，上诉中说的，当block在栈上时，对变量都不会产生强引用，当拷贝到堆上时，通过copy函数对变量进行处理。
+
+
+
+
+
+#### 2.2 block循环引用问题
+
+上述中既然block有对其变量进行强引用，那么就有可能存在循环引用
+
+如果一个对象有一个block的强引用的属性，然后这个block的实现代码中又调用了该对象，就会存在循环引用，释放不了该对象。
+
+```
+TestObject *test = [[TestObject alloc] init];
+test.testBlock = ^{
+    NSLog(@"调用了对象:%@",test);
+};
+```
+
+可以用__weak来解决循环引用
+
+```
+__weak typeof(test) weakTest = test;
+```
+
+也可以用使用__unsafe_unretained来解决循环引用，但是一般不使用，因为对象相会时不会将指针执行nil，会造成野指针的情况。
+
+使用__block也可以解决，但是需要在最后将对象置nil。也必须调用一遍该block。最好还是使用weak修饰的方式来解决，并且还需要在block内部使用strong再次进行修饰，不然会在部分延时或者异步的操作中找不到对应的值。
+
+```
+TestObject *test = [[TestObject alloc] init];
+__weak typeof(test) weakTest = test;
+test.testBlock = ^{
+    __strong typeof(weakTest) strongTest = weakTest;
+    NSLog(@"调用了对象:%@",weakTest);
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        NSLog(@"delay调用了对象:%@",strongTest);
+    });
+};
+```
+

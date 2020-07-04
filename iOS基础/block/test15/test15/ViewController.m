@@ -7,12 +7,14 @@
 //
 
 #import "ViewController.h"
+#import "TestObject.h"
 
 typedef int(^Test4Block)(int t);
 
 @interface ViewController ()
 
 @property (nonatomic, copy) Test4Block block5;
+@property (nonatomic, strong) TestObject *test;
 
 @end
 
@@ -96,6 +98,13 @@ typedef int(^Test4Block)(int t);
     
     Test4Block block9 = [self doSomeThing2:4];
     NSLog(@"result = %d", block9(2));
+    
+//    self.test = [[TestObject alloc] init];
+//    self.test.testBlock = ^{
+//        NSLog(@"%@",self.block5);
+//    };
+//    self.test.testBlock();
+    
     
 }
 

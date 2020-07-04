@@ -14,6 +14,7 @@
 		5E2ABEEC24ADC64D00BCA672 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5E2ABEEB24ADC64D00BCA672 /* Assets.xcassets */; };
 		5E2ABEEF24ADC64D00BCA672 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5E2ABEED24ADC64D00BCA672 /* LaunchScreen.storyboard */; };
 		5E2ABEF224ADC64D00BCA672 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E2ABEF124ADC64D00BCA672 /* main.m */; };
+		5E5EC69724B0E22A003BC6E8 /* TestObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E5EC69624B0E22A003BC6E8 /* TestObject.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -29,6 +30,8 @@
 		5E2ABEEE24ADC64D00BCA672 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		5E2ABEF024ADC64D00BCA672 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5E2ABEF124ADC64D00BCA672 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		5E5EC69524B0E22A003BC6E8 /* TestObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TestObject.h; sourceTree = "<group>"; };
+		5E5EC69624B0E22A003BC6E8 /* TestObject.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestObject.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,6 +70,8 @@
 				5E2ABEE324ADC64900BCA672 /* SceneDelegate.m */,
 				5E2ABEE524ADC64900BCA672 /* ViewController.h */,
 				5E2ABEE624ADC64900BCA672 /* ViewController.m */,
+				5E5EC69524B0E22A003BC6E8 /* TestObject.h */,
+				5E5EC69624B0E22A003BC6E8 /* TestObject.m */,
 				5E2ABEE824ADC64900BCA672 /* Main.storyboard */,
 				5E2ABEEB24ADC64D00BCA672 /* Assets.xcassets */,
 				5E2ABEED24ADC64D00BCA672 /* LaunchScreen.storyboard */,
@@ -148,6 +153,7 @@
 			files = (
 				5E2ABEE724ADC64900BCA672 /* ViewController.m in Sources */,
 				5E2ABEE124ADC64900BCA672 /* AppDelegate.m in Sources */,
+				5E5EC69724B0E22A003BC6E8 /* TestObject.m in Sources */,
 				5E2ABEF224ADC64D00BCA672 /* main.m in Sources */,
 				5E2ABEE424ADC64900BCA672 /* SceneDelegate.m in Sources */,
 			);

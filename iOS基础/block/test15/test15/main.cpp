@@ -106,7 +106,15 @@ struct __AtAutoreleasePool {
 };
 
 #define __OFFSETOFIVAR__(TYPE, MEMBER) ((long long) &((TYPE *)0)->MEMBER)
-static __NSConstantStringImpl __NSConstantStringImpl__var_folders_hz_6yv0h07n6mz76tv81_0rmgmr0000gn_T_main_670430_mi_0 __attribute__ ((section ("__DATA, __cfstring"))) = {__CFConstantStringClassReference,0x000007c8,"OC\345\257\271\350\261\241:%@",11};
+static void __Block_byref_id_object_copy_131(void *dst, void *src) {
+ _Block_object_assign((char*)dst + 40, *(void * *) ((char*)src + 40), 131);
+}
+static void __Block_byref_id_object_dispose_131(void *src) {
+ _Block_object_dispose(*(void * *) ((char*)src + 40), 131);
+}
+static __NSConstantStringImpl __NSConstantStringImpl__var_folders_hz_6yv0h07n6mz76tv81_0rmgmr0000gn_T_main_480e2a_mi_0 __attribute__ ((section ("__DATA, __cfstring"))) = {__CFConstantStringClassReference,0x000007c8,"OC\345\257\271\350\261\241:%@-%@-%@",17};
+static __NSConstantStringImpl __NSConstantStringImpl__var_folders_hz_6yv0h07n6mz76tv81_0rmgmr0000gn_T_main_480e2a_mi_1 __attribute__ ((section ("__DATA, __cfstring"))) = {__CFConstantStringClassReference,0x000007c8,"\350\260\203\347\224\250\344\272\206\345\257\271\350\261\241:%@",18};
+static __NSConstantStringImpl __NSConstantStringImpl__var_folders_hz_6yv0h07n6mz76tv81_0rmgmr0000gn_T_main_480e2a_mi_2 __attribute__ ((section ("__DATA, __cfstring"))) = {__CFConstantStringClassReference,0x000007c8,"delay\350\260\203\347\224\250\344\272\206\345\257\271\350\261\241:%@",23};
 
 
 
@@ -71854,15 +71862,65 @@ struct AppDelegate_IMPL {
 
 /* @end */
 
+#pragma clang assume_nonnull begin
+
+typedef void(*TestBlock)(void);
+
+
+#ifndef _REWRITER_typedef_TestObject
+#define _REWRITER_typedef_TestObject
+typedef struct objc_object TestObject;
+typedef struct {} _objc_exc_TestObject;
+#endif
+
+struct TestObject_IMPL {
+	struct NSObject_IMPL NSObject_IVARS;
+};
+
+
+// @property (nonatomic, copy) TestBlock testBlock;
+
+/* @end */
+
+#pragma clang assume_nonnull end
 
 int s = 2;
 
+struct __Block_byref_test1_0 {
+  void *__isa;
+__Block_byref_test1_0 *__forwarding;
+ int __flags;
+ int __size;
+ void (*__Block_byref_id_object_copy)(void*, void*);
+ void (*__Block_byref_id_object_dispose)(void*);
+ NSObject *__strong test1;
+};
+struct __Block_byref_test2_1 {
+  void *__isa;
+__Block_byref_test2_1 *__forwarding;
+ int __flags;
+ int __size;
+ void (*__Block_byref_id_object_copy)(void*, void*);
+ void (*__Block_byref_id_object_dispose)(void*);
+ NSObject *__strong test2;
+};
+struct __Block_byref_test3_2 {
+  void *__isa;
+__Block_byref_test3_2 *__forwarding;
+ int __flags;
+ int __size;
+ void (*__Block_byref_id_object_copy)(void*, void*);
+ void (*__Block_byref_id_object_dispose)(void*);
+ NSObject *__strong test3;
+};
 
 struct __main_block_impl_0 {
   struct __block_impl impl;
   struct __main_block_desc_0* Desc;
-  NSObject *__strong test1;
-  __main_block_impl_0(void *fp, struct __main_block_desc_0 *desc, NSObject *__strong _test1, int flags=0) : test1(_test1) {
+  __Block_byref_test1_0 *test1; // by ref
+  __Block_byref_test2_1 *test2; // by ref
+  __Block_byref_test3_2 *test3; // by ref
+  __main_block_impl_0(void *fp, struct __main_block_desc_0 *desc, __Block_byref_test1_0 *_test1, __Block_byref_test2_1 *_test2, __Block_byref_test3_2 *_test3, int flags=0) : test1(_test1->__forwarding), test2(_test2->__forwarding), test3(_test3->__forwarding) {
     impl.isa = &_NSConcreteStackBlock;
     impl.Flags = flags;
     impl.FuncPtr = fp;
@@ -71870,14 +71928,16 @@ struct __main_block_impl_0 {
   }
 };
 static void __main_block_func_0(struct __main_block_impl_0 *__cself) {
-  NSObject *__strong test1 = __cself->test1; // bound by copy
+  __Block_byref_test1_0 *test1 = __cself->test1; // bound by ref
+  __Block_byref_test2_1 *test2 = __cself->test2; // bound by ref
+  __Block_byref_test3_2 *test3 = __cself->test3; // bound by ref
 
 
-            NSLog((NSString *)&__NSConstantStringImpl__var_folders_hz_6yv0h07n6mz76tv81_0rmgmr0000gn_T_main_670430_mi_0,test1);
+            NSLog((NSString *)&__NSConstantStringImpl__var_folders_hz_6yv0h07n6mz76tv81_0rmgmr0000gn_T_main_480e2a_mi_0,(test1->__forwarding->test1), (test2->__forwarding->test2), (test3->__forwarding->test3));
         }
-static void __main_block_copy_0(struct __main_block_impl_0*dst, struct __main_block_impl_0*src) {_Block_object_assign((void*)&dst->test1, (void*)src->test1, 3/*BLOCK_FIELD_IS_OBJECT*/);}
+static void __main_block_copy_0(struct __main_block_impl_0*dst, struct __main_block_impl_0*src) {_Block_object_assign((void*)&dst->test1, (void*)src->test1, 8/*BLOCK_FIELD_IS_BYREF*/);_Block_object_assign((void*)&dst->test2, (void*)src->test2, 8/*BLOCK_FIELD_IS_BYREF*/);_Block_object_assign((void*)&dst->test3, (void*)src->test3, 8/*BLOCK_FIELD_IS_BYREF*/);}
 
-static void __main_block_dispose_0(struct __main_block_impl_0*src) {_Block_object_dispose((void*)src->test1, 3/*BLOCK_FIELD_IS_OBJECT*/);}
+static void __main_block_dispose_0(struct __main_block_impl_0*src) {_Block_object_dispose((void*)src->test1, 8/*BLOCK_FIELD_IS_BYREF*/);_Block_object_dispose((void*)src->test2, 8/*BLOCK_FIELD_IS_BYREF*/);_Block_object_dispose((void*)src->test3, 8/*BLOCK_FIELD_IS_BYREF*/);}
 
 static struct __main_block_desc_0 {
   size_t reserved;
@@ -71885,14 +71945,78 @@ static struct __main_block_desc_0 {
   void (*copy)(struct __main_block_impl_0*, struct __main_block_impl_0*);
   void (*dispose)(struct __main_block_impl_0*);
 } __main_block_desc_0_DATA = { 0, sizeof(struct __main_block_impl_0), __main_block_copy_0, __main_block_dispose_0};
+
+struct __main_block_impl_1 {
+  struct __block_impl impl;
+  struct __main_block_desc_1* Desc;
+  TestObject *__strong strongTest;
+  __main_block_impl_1(void *fp, struct __main_block_desc_1 *desc, TestObject *__strong _strongTest, int flags=0) : strongTest(_strongTest) {
+    impl.isa = &_NSConcreteStackBlock;
+    impl.Flags = flags;
+    impl.FuncPtr = fp;
+    Desc = desc;
+  }
+};
+static void __main_block_func_1(struct __main_block_impl_1 *__cself) {
+  TestObject *__strong strongTest = __cself->strongTest; // bound by copy
+
+                NSLog((NSString *)&__NSConstantStringImpl__var_folders_hz_6yv0h07n6mz76tv81_0rmgmr0000gn_T_main_480e2a_mi_2,strongTest);
+            }
+static void __main_block_copy_1(struct __main_block_impl_1*dst, struct __main_block_impl_1*src) {_Block_object_assign((void*)&dst->strongTest, (void*)src->strongTest, 3/*BLOCK_FIELD_IS_OBJECT*/);}
+
+static void __main_block_dispose_1(struct __main_block_impl_1*src) {_Block_object_dispose((void*)src->strongTest, 3/*BLOCK_FIELD_IS_OBJECT*/);}
+
+static struct __main_block_desc_1 {
+  size_t reserved;
+  size_t Block_size;
+  void (*copy)(struct __main_block_impl_1*, struct __main_block_impl_1*);
+  void (*dispose)(struct __main_block_impl_1*);
+} __main_block_desc_1_DATA = { 0, sizeof(struct __main_block_impl_1), __main_block_copy_1, __main_block_dispose_1};
+
+struct __main_block_impl_2 {
+  struct __block_impl impl;
+  struct __main_block_desc_2* Desc;
+  TestObject *__weak weakTest;
+  __main_block_impl_2(void *fp, struct __main_block_desc_2 *desc, TestObject *__weak _weakTest, int flags=0) : weakTest(_weakTest) {
+    impl.isa = &_NSConcreteStackBlock;
+    impl.Flags = flags;
+    impl.FuncPtr = fp;
+    Desc = desc;
+  }
+};
+static void __main_block_func_2(struct __main_block_impl_2 *__cself) {
+  TestObject *__weak weakTest = __cself->weakTest; // bound by copy
+
+            __attribute__((objc_ownership(strong))) typeof(weakTest) strongTest = weakTest;
+            NSLog((NSString *)&__NSConstantStringImpl__var_folders_hz_6yv0h07n6mz76tv81_0rmgmr0000gn_T_main_480e2a_mi_1,weakTest);
+            dispatch_after(dispatch_time((0ull), (int64_t)(1 * 1000000000ull)), dispatch_get_main_queue(), ((void (*)())&__main_block_impl_1((void *)__main_block_func_1, &__main_block_desc_1_DATA, strongTest, 570425344)));
+        }
+static void __main_block_copy_2(struct __main_block_impl_2*dst, struct __main_block_impl_2*src) {_Block_object_assign((void*)&dst->weakTest, (void*)src->weakTest, 3/*BLOCK_FIELD_IS_OBJECT*/);}
+
+static void __main_block_dispose_2(struct __main_block_impl_2*src) {_Block_object_dispose((void*)src->weakTest, 3/*BLOCK_FIELD_IS_OBJECT*/);}
+
+static struct __main_block_desc_2 {
+  size_t reserved;
+  size_t Block_size;
+  void (*copy)(struct __main_block_impl_2*, struct __main_block_impl_2*);
+  void (*dispose)(struct __main_block_impl_2*);
+} __main_block_desc_2_DATA = { 0, sizeof(struct __main_block_impl_2), __main_block_copy_2, __main_block_dispose_2};
 int main(int argc, char * argv[]) {
     NSString * appDelegateClassName;
     /* @autoreleasepool */ { __AtAutoreleasePool __autoreleasepool; 
 
         appDelegateClassName = NSStringFromClass(((Class (*)(id, SEL))(void *)objc_msgSend)((id)objc_getClass("AppDelegate"), sel_registerName("class")));
-        NSObject *test1 = ((NSObject *(*)(id, SEL))(void *)objc_msgSend)((id)((NSObject *(*)(id, SEL))(void *)objc_msgSend)((id)objc_getClass("NSObject"), sel_registerName("alloc")), sel_registerName("init"));
-        void (*Test10block)(void) = ((void (*)())&__main_block_impl_0((void *)__main_block_func_0, &__main_block_desc_0_DATA, test1, 570425344));
+        __attribute__((__blocks__(byref))) __Block_byref_test1_0 test1 = {(void*)0,(__Block_byref_test1_0 *)&test1, 33554432, sizeof(__Block_byref_test1_0), __Block_byref_id_object_copy_131, __Block_byref_id_object_dispose_131, ((NSObject *(*)(id, SEL))(void *)objc_msgSend)((id)((NSObject *(*)(id, SEL))(void *)objc_msgSend)((id)objc_getClass("NSObject"), sel_registerName("alloc")), sel_registerName("init"))};
+        __attribute__((__blocks__(byref))) __Block_byref_test2_1 test2 = {(void*)0,(__Block_byref_test2_1 *)&test2, 33554432, sizeof(__Block_byref_test2_1), __Block_byref_id_object_copy_131, __Block_byref_id_object_dispose_131, ((NSObject *(*)(id, SEL))(void *)objc_msgSend)((id)((NSObject *(*)(id, SEL))(void *)objc_msgSend)((id)objc_getClass("NSObject"), sel_registerName("alloc")), sel_registerName("init"))};
+        __attribute__((__blocks__(byref))) __Block_byref_test3_2 test3 = {(void*)0,(__Block_byref_test3_2 *)&test3, 33554432, sizeof(__Block_byref_test3_2), __Block_byref_id_object_copy_131, __Block_byref_id_object_dispose_131, ((NSObject *(*)(id, SEL))(void *)objc_msgSend)((id)((NSObject *(*)(id, SEL))(void *)objc_msgSend)((id)objc_getClass("NSObject"), sel_registerName("alloc")), sel_registerName("init"))};
+        void (*Test10block)(void) = ((void (*)())&__main_block_impl_0((void *)__main_block_func_0, &__main_block_desc_0_DATA, (__Block_byref_test1_0 *)&test1, (__Block_byref_test2_1 *)&test2, (__Block_byref_test3_2 *)&test3, 570425344));
         ((void (*)(__block_impl *))((__block_impl *)Test10block)->FuncPtr)((__block_impl *)Test10block);
+
+
+        TestObject *test = ((TestObject *(*)(id, SEL))(void *)objc_msgSend)((id)((TestObject *(*)(id, SEL))(void *)objc_msgSend)((id)objc_getClass("TestObject"), sel_registerName("alloc")), sel_registerName("init"));
+        __attribute__((objc_ownership(weak))) typeof(test) weakTest = test;
+        ((void (*)(id, SEL, TestBlock _Nonnull))(void *)objc_msgSend)((id)test, sel_registerName("setTestBlock:"), ((void (*)())&__main_block_impl_2((void *)__main_block_func_2, &__main_block_desc_2_DATA, weakTest, 570425344)));
+        ((TestBlock (*)(id, SEL))(void *)objc_msgSend)((id)test, sel_registerName("testBlock"))();
     }
     return UIApplicationMain(argc, argv, __null, appDelegateClassName);
 }
