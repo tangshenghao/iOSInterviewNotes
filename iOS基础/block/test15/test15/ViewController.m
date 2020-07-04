@@ -51,13 +51,14 @@ typedef int(^Test4Block)(int t);
     int result2 = block4(2);
     NSLog(@"typedef 有参数，有返回值的block：%@---%d", block4, result2);
     
+    __block int k = 6;
     self.block5 = ^int(int t) {
-        NSLog(@"typedef 属性 有参数，有返回值%d", t);
+        NSLog(@"typedef 属性 有参数，有返回值%d---%d", t, k);
         return t;
     };
     
-    int result3 = self.block5(2);
-    NSLog(@"typedef 有参数，有返回值的block：%@---%d", self.block5, result3);
+//    int result3 = self.block5(2);
+//    NSLog(@"typedef 有参数，有返回值的block：%@---%d", self.block5, result3);
     
     
     
@@ -111,6 +112,9 @@ typedef int(^Test4Block)(int t);
     return block;
 }
 
+- (IBAction)testAction:(id)sender {
+    self.block5(3);
+}
 
 
 @end

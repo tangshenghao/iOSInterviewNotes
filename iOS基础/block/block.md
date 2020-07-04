@@ -298,3 +298,108 @@ __ block可以用于解决block内部无法修改auto变量值的问题，但不
 
 
 ### 2 block内存管理
+
+#### 2.1 block访问OC对象
+
+当block内部访问外部的OC对象时，例如：
+
+```
+NSObject *test1 = [[NSObject alloc] init];
+void (^Test10block)(void) = ^{
+
+    NSLog(@"OC对象:%@",test1);
+};
+Test10block();
+```
+
+通过编译器转换后，代码如下：
+
+```
+struct __main_block_impl_0 {
+  struct __block_impl impl;
+  struct __main_block_desc_0* Desc;
+  NSObject *__strong test1;
+  __main_block_impl_0(void *fp, struct __main_block_desc_0 *desc, NSObject *__strong _test1, int flags=0) : test1(_test1) {
+    impl.isa = &_NSConcreteStackBlock;
+    impl.Flags = flags;
+    impl.FuncPtr = fp;
+    Desc = desc;
+  }
+};
+static void __main_block_func_0(struct __main_block_impl_0 *__cself) {
+  NSObject *__strong test1 = __cself->test1; // bound by copy
+
+
+            NSLog((NSString *)&__NSConstantStringImpl__var_folders_hz_6yv0h07n6mz76tv81_0rmgmr0000gn_T_main_99ac31_mi_0,test1);
+        }
+static void __main_block_copy_0(struct __main_block_impl_0*dst, struct __main_block_impl_0*src) {_Block_object_assign((void*)&dst->test1, (void*)src->test1, 3/*BLOCK_FIELD_IS_OBJECT*/);}
+
+static void __main_block_dispose_0(struct __main_block_impl_0*src) {_Block_object_dispose((void*)src->test1, 3/*BLOCK_FIELD_IS_OBJECT*/);}
+
+static struct __main_block_desc_0 {
+  size_t reserved;
+  size_t Block_size;
+  void (*copy)(struct __main_block_impl_0*, struct __main_block_impl_0*);
+  void (*dispose)(struct __main_block_impl_0*);
+} __main_block_desc_0_DATA = { 0, sizeof(struct __main_block_impl_0), __main_block_copy_0, __main_block_dispose_0};
+```
+
+
+
+通过上述的解释，因为在ARC下，会执行copy，从栈拷贝到堆上，结构体__main_block_desc_0中包含copy和dispose。
+
+copy会调用__main_block_copy_0
+
+```
+static void __main_block_copy_0(struct __main_block_impl_0*dst, struct __main_block_impl_0*src) {_Block_object_assign((void*)&dst->test1, (void*)src->test1, 3/*BLOCK_FIELD_IS_OBJECT*/);}
+```
+
+其中_Block_object_assign会根据代码中的修饰符strong或者weak对其进行强引用或者弱引用。
+
+查看__main_block_impl_0
+
+```
+struct __main_block_impl_0 {
+  struct __block_impl impl;
+  struct __main_block_desc_0* Desc;
+  // strong 强引用
+  NSObject *__strong test1;
+  __main_block_impl_0(void *fp, struct __main_block_desc_0 *desc, NSObject *__strong _test1, int flags=0) : test1(_test1) {
+    impl.isa = &_NSConcreteStackBlock;
+    impl.Flags = flags;
+    impl.FuncPtr = fp;
+    Desc = desc;
+  }
+};
+```
+
+可以看到修饰符是strong，所以调用_Block_object_assign时候，会对其进行强引用。
+
+拷贝的时候，会调用block内部的copy函数，copy函数内部会调用_Block_object_assign函数，然后对__block变量形成强引用(retain)
+
+再看一个例子：
+
+```
+int j = 6;
+self.block5 = ^int(int t) {
+    NSLog(@"%d---%d", t, j);
+    return t;
+};
+```
+
+因为j是在栈上的，在block内部引用j，但是当block从栈上拷贝到堆上时，怎么能保证下次block访问j时，能访问的到。
+
+假设现在有两个栈上的block，分别是block0和block1，同时引用了栈上的__block变量，现在对block0进行copy操作，block会复制到堆上，因为block0持有 _block变量，所以也会把这个变量复制到堆上，同时堆上的block0对堆上的变量是强引用，所以这样能达到block0随时能访问到该变量。
+
+此时如果block也拷贝到堆上，因为刚才block中的变量已经拷贝到堆上了，就不需要再次拷贝，只需要把堆上的block1也强引用堆上的变量就可以了。
+
+然后释放的时候
+
+会调用block内部的dispose函数
+
+dispose函数内部会调用_block_object_dispose函数，该函数会自动释放引用的__block变量(release)
+
+上述block0和block1都引用block变量，当block销毁时候，直接销毁堆上的block变量，但需要两个都废弃时，才会废弃__blcok变量。
+
+其实就和引用计数一样，都没有引用时才废弃。
+
