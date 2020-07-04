@@ -16,7 +16,7 @@ block是封装了函数调用以及函数调用环境的OC对象
 
 block的结构如下图：
 
-
+![](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/iOS%E5%9F%BA%E7%A1%80/block/block%E5%BA%95%E5%B1%82%E7%BB%93%E6%9E%84.jpg?raw=true)
 
 通过生成cpp文件查看转换后的代码来了解
 
@@ -278,8 +278,6 @@ __Block_byref_i_0 *__forwarding;
 };
 ```
 
-
-
 __Block_byref_i_0的第二个参数的类型也是本身的结构体，forwarding里面存放的是指向自身的指针。
 
 调用的时候，先用forwarding找到自己，然后取出对应的值
@@ -289,7 +287,7 @@ __Block_byref_i_0 *i = __cself->i; // bound by ref
 (i->__forwarding->i) = 3;
 ```
 
-
+![](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/iOS%E5%9F%BA%E7%A1%80/block/___block%E7%9A%84%E7%BB%93%E6%9E%84%E4%BD%93.jpg?raw=true)
 
 __ block可以用于解决block内部无法修改auto变量值的问题，但不能修饰全局变量和静态变量。
 
@@ -427,7 +425,7 @@ NSLog((NSString *)&__NSConstantStringImpl__var_folders_hz_6yv0h07n6mz76tv81_0rmg
 
 因为，如果__变量还在栈上，是可以直接访问，但是如果已经拷贝到堆堆上，访问时，还去访问栈上的，就会出问题，所以先根据forwarding找到堆上的地址，然后再去取值，如下图：
 
-
+![](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/iOS%E5%9F%BA%E7%A1%80/block/block%E5%8F%98%E9%87%8Fforwarding%E6%8C%87%E5%90%91.jpg?raw=true)
 
 所以，上诉中说的，当block在栈上时，对变量都不会产生强引用，当拷贝到堆上时，通过copy函数对变量进行处理。
 
