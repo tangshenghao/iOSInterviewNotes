@@ -27,7 +27,7 @@ iOS面试的准备、知识点的积累
 * [runloop](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/iOS%E5%9F%BA%E7%A1%80/runloop/runloop.md)
 * [block](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/iOS%E5%9F%BA%E7%A1%80/block/block.md)
 * [KVC与KVO](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/iOS%E5%9F%BA%E7%A1%80/KVC%E5%92%8CKVO/KVC%E5%92%8CKVO.md)
-* category与extension
+* [category与extension](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/iOS%E5%9F%BA%E7%A1%80/category%E5%92%8Cextension/category%E5%92%8Cextension.md)
 * 多线程
 * 锁
 * 响应链
