@@ -1,6 +1,6 @@
 
 //H5交互方法替换
-var iosApiList = ["downloadThirdapp", "getDevInfoById", "getDevList", "getStateInfo", "isNetworkConnected", "operateTvByTcast", "receiveH5Msg", "requestCityInfo", "searchDevice", "sendRemoteMessage", "setShowBackDialog", "setStateInfo", "startActivity", "startApp", "startDeviceSetActivity", "startDeviceShareActivity", "startFindDevice", "startGeneralDeviceSetActivity", "startHomeModeActivity", "stopAppGoBack", "sendLogToOC", "getPhoneAppVersion", "reLoadAirBoxIndex", "startRN", "getH5MemoryFromOC", "setH5MemoryToOC", "washBack", "reportBiData", "getPhoneAppVersion", "backToDeviceListRN"];
+var iosApiList = ["method1", "method2", "method3", "method4", "method5", "method6", "method7"];
 
 iosApiList.forEach (
   function (v) {
@@ -12,7 +12,7 @@ iosApiList.forEach (
           s = s + '#$#@';
         }
       }
-      var j = window.prompt('tclH5_' + v, s);
+      var j = window.prompt('tshH5_' + v, s);
       if (j == "true##") {
         return true;
       } else if (j == "false##") {
@@ -28,7 +28,7 @@ iosApiList.forEach (
 console.log = (
   function (oriLogFunc) {
     return function (str) {
-      window.prompt('tclH5_' + 'consoleLog', str);
+      window.prompt('tshH5_' + 'consoleLog', str);
       oriLogFunc.call(console, str);
     }
   }
@@ -37,7 +37,7 @@ console.log = (
 console.warn = (
   function (oriWarnLogFunc) {
     return function (str) {
-      window.prompt('tclH5_' + 'consoleWarnLog', str);
+      window.prompt('tshH5_' + 'consoleWarnLog', str);
       oriWarnLogFunc.call(console, str);
     }
   }
@@ -46,7 +46,7 @@ console.warn = (
 console.error = (
   function (oriErrorLogFunc) {
     return function (str) {
-      window.prompt('tclH5_' + 'consoleErrorLog', str);
+      window.prompt('tshH5_' + 'consoleErrorLog', str);
       oriErrorLogFunc.call(console, str);
     }
   }
