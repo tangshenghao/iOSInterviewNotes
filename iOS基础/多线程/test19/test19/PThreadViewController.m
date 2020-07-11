@@ -13,6 +13,10 @@
 
 @property (nonatomic, strong) UIImageView *imageView;
 
+@property (nonatomic, assign) int ticketCount;
+
+@property (nonatomic, strong) NSLock *lock;
+
 @end
 
 @implementation PThreadViewController
@@ -37,9 +41,11 @@ void *run(void *param) {
     // pthread方式
 //    [self pthreadRun];
     // NSThread方式
-    [self nsthreadRun];
+//    [self nsthreadRun];
     // NSThread 线程通讯
-    [self dosomeAsyncAction];
+//    [self dosomeAsyncAction];
+    // NSThread 线程安全
+    [self threadSafe];
 }
 
 - (void)pthreadRun {
@@ -59,6 +65,9 @@ void *run(void *param) {
     
     // 创建线程后自动执行方法
     [NSThread detachNewThreadSelector:@selector(nsthreadRunAction) toTarget:self withObject:nil];
+    
+    // 隐式创建并启动线程 该方法是NSObject的分类NSThreadPerformAdditions中实现的
+    [self performSelectorInBackground:@selector(nsthreadRunAction) withObject:nil];
     
 }
 
@@ -86,6 +95,44 @@ void *run(void *param) {
     NSLog(@"renderImageView - %@", [NSThread currentThread]);
     
     self.imageView.image = image;
+}
+
+- (void)threadSafe {
+    
+    // 初始化NSLock
+    self.lock = [[NSLock alloc] init];
+    
+    // 初始50张票
+    self.ticketCount = 50;
+    
+    // 两个售票口
+    NSThread *thread1 = [[NSThread alloc] initWithTarget:self selector:@selector(buyTicket) object:nil];
+    thread1.name = @"售票口1";
+    NSThread *thread2 = [[NSThread alloc] initWithTarget:self selector:@selector(buyTicket) object:nil];
+    thread2.name = @"售票口2";
+    
+    // 开始售卖票
+    [thread1 start];
+    [thread2 start];
+    
+}
+
+- (void)buyTicket {
+    while (1) {
+        [self.lock lock];
+        if (self.ticketCount > 0) {
+            self.ticketCount--;
+            [NSThread sleepForTimeInterval:0.1
+             ];
+            NSLog(@"剩余票数为：%d  thread:%@", self.ticketCount, [NSThread currentThread]);
+        }
+        [self.lock unlock];
+        
+        if (self.ticketCount <= 0) {
+            NSLog(@"票卖完了");
+            break;
+        }
+    }
 }
 
 - (void)dealloc {
