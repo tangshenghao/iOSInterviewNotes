@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5EB2FBAC24B8094F00DF18AB /* TSHOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 5EB2FBAB24B8094F00DF18AB /* TSHOperation.m */; };
+		5EB2FBAF24B83FDE00DF18AB /* GCDViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5EB2FBAE24B83FDE00DF18AB /* GCDViewController.m */; };
 		5EEB15C724B6C5A400525454 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 5EEB15C624B6C5A400525454 /* AppDelegate.m */; };
 		5EEB15CA24B6C5A400525454 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 5EEB15C924B6C5A400525454 /* SceneDelegate.m */; };
 		5EEB15CD24B6C5A400525454 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5EEB15CC24B6C5A400525454 /* ViewController.m */; };
@@ -19,6 +21,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		5EB2FBAA24B8094F00DF18AB /* TSHOperation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TSHOperation.h; sourceTree = "<group>"; };
+		5EB2FBAB24B8094F00DF18AB /* TSHOperation.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TSHOperation.m; sourceTree = "<group>"; };
+		5EB2FBAD24B83FDE00DF18AB /* GCDViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GCDViewController.h; sourceTree = "<group>"; };
+		5EB2FBAE24B83FDE00DF18AB /* GCDViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GCDViewController.m; sourceTree = "<group>"; };
 		5EEB15C224B6C5A400525454 /* test19.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = test19.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5EEB15C524B6C5A400525454 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		5EEB15C624B6C5A400525454 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -77,6 +83,10 @@
 				5EEB15E724B7135700525454 /* PThreadViewController.m */,
 				5EEB15E924B71E1000525454 /* NSOperationViewController.h */,
 				5EEB15EA24B71E1000525454 /* NSOperationViewController.m */,
+				5EB2FBAA24B8094F00DF18AB /* TSHOperation.h */,
+				5EB2FBAB24B8094F00DF18AB /* TSHOperation.m */,
+				5EB2FBAD24B83FDE00DF18AB /* GCDViewController.h */,
+				5EB2FBAE24B83FDE00DF18AB /* GCDViewController.m */,
 				5EEB15CE24B6C5A400525454 /* Main.storyboard */,
 				5EEB15D124B6C5A700525454 /* Assets.xcassets */,
 				5EEB15D324B6C5A700525454 /* LaunchScreen.storyboard */,
@@ -159,6 +169,8 @@
 				5EEB15CD24B6C5A400525454 /* ViewController.m in Sources */,
 				5EEB15E824B7135700525454 /* PThreadViewController.m in Sources */,
 				5EEB15C724B6C5A400525454 /* AppDelegate.m in Sources */,
+				5EB2FBAF24B83FDE00DF18AB /* GCDViewController.m in Sources */,
+				5EB2FBAC24B8094F00DF18AB /* TSHOperation.m in Sources */,
 				5EEB15D824B6C5A700525454 /* main.m in Sources */,
 				5EEB15CA24B6C5A400525454 /* SceneDelegate.m in Sources */,
 				5EEB15EB24B71E1000525454 /* NSOperationViewController.m in Sources */,

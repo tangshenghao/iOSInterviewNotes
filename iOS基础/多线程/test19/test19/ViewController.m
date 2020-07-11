@@ -9,6 +9,7 @@
 #import "ViewController.h"
 #import "PThreadViewController.h"
 #import "NSOperationViewController.h"
+#import "GCDViewController.h"
 
 @interface ViewController ()
 
@@ -34,8 +35,8 @@
 }
 
 - (IBAction)pushGCDVC:(id)sender {
-    
-    
+    GCDViewController *gcdVC = [[GCDViewController alloc] init];
+    [self.navigationController pushViewController:gcdVC animated:YES];
 }
 
 
