@@ -26,6 +26,8 @@
     // Do any additional setup after loading the view.
     self.view.backgroundColor = [UIColor whiteColor];
     
+//    [NSThread detachNewThreadSelector:@selector(operationRun) toTarget:self withObject:nil];
+    
     
     UIButton *button1 = [UIButton buttonWithType:UIButtonTypeSystem];
     [button1 setTitle:@"Operation 直接Run 操作" forState:UIControlStateNormal];
@@ -86,7 +88,7 @@
 //            NSLog(@"2---%@", [NSThread currentThread]);
 //        }
 //    }];
-//
+
 //    [op addExecutionBlock:^{
 //        for (int i = 0; i < 2; i++) {
 //            [NSThread sleepForTimeInterval:2];
@@ -117,46 +119,47 @@
     queue.maxConcurrentOperationCount = 2;
     NSInvocationOperation *op1 = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(task1) object:nil];
     NSInvocationOperation *op2 = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(task2) object:nil];
-    NSBlockOperation *op3 = [NSBlockOperation blockOperationWithBlock:^{
-        for (int i = 0; i < 2; i++) {
-            [NSThread sleepForTimeInterval:2];
-            NSLog(@"3---%@", [NSThread currentThread]);
-        }
-    }];
-    [op3 addExecutionBlock:^{
-        for (int i = 0; i < 2; i++) {
-            [NSThread sleepForTimeInterval:2];
-            NSLog(@"4---%@", [NSThread currentThread]);
-        }
-    }];
-    
-    self.op4 = [NSBlockOperation blockOperationWithBlock:^{
-        for (int i = 0; i < 2; i++) {
-            [NSThread sleepForTimeInterval:2];
-            NSLog(@"7---%@", [NSThread currentThread]);
-        }
-    }];
+//    NSBlockOperation *op3 = [NSBlockOperation blockOperationWithBlock:^{
+//        for (int i = 0; i < 2; i++) {
+//            [NSThread sleepForTimeInterval:2];
+//            NSLog(@"3---%@", [NSThread currentThread]);
+//        }
+//    }];
+//    [op3 addExecutionBlock:^{
+//        for (int i = 0; i < 2; i++) {
+//            [NSThread sleepForTimeInterval:2];
+//            NSLog(@"4---%@", [NSThread currentThread]);
+//        }
+//    }];
+//
+//    self.op4 = [NSBlockOperation blockOperationWithBlock:^{
+//        for (int i = 0; i < 2; i++) {
+//            [NSThread sleepForTimeInterval:2];
+//            NSLog(@"7---%@", [NSThread currentThread]);
+//        }
+//    }];
     
     [queue addOperation:op1];
     [queue addOperation:op2];
-    [queue addOperation:op3];
+//    [queue addOperation:op3];
+//
+//
+//    [queue addOperationWithBlock:^{
+//        for (int i = 0; i < 2; i++) {
+//            [NSThread sleepForTimeInterval:2];
+//            NSLog(@"5---%@", [NSThread currentThread]);
+//        }
+//    }];
     
-    
-    [queue addOperationWithBlock:^{
-        for (int i = 0; i < 2; i++) {
-            [NSThread sleepForTimeInterval:2];
-            NSLog(@"5---%@", [NSThread currentThread]);
-        }
-    }];
-    
-    [queue addOperationWithBlock:^{
-        for (int i = 0; i < 2; i++) {
-            [NSThread sleepForTimeInterval:2];
-            NSLog(@"6---%@", [NSThread currentThread]);
-        }
-    }];
-    
-    [queue addOperation:self.op4];
+//
+//    [queue addOperationWithBlock:^{
+//        for (int i = 0; i < 2; i++) {
+//            [NSThread sleepForTimeInterval:2];
+//            NSLog(@"6---%@", [NSThread currentThread]);
+//        }
+//    }];
+//
+//    [queue addOperation:self.op4];
 }
 
 - (void)operationDependeRun {
@@ -190,24 +193,22 @@
 }
 
 - (void)operationCommunity {
+    // 新建队列
     NSOperationQueue *queue = [[NSOperationQueue alloc] init];
-    
+    // 将操作添加到队列中
     [queue addOperationWithBlock:^{
         for (int i = 0; i < 2; i++) {
             [NSThread sleepForTimeInterval:2];
             NSLog(@"1---%@", [NSThread currentThread]);
         }
-        
+        // 在主队列中执行操作
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             for (int i = 0; i < 2; i++) {
                 [NSThread sleepForTimeInterval:2];
                 NSLog(@"2---%@", [NSThread currentThread]);
             }
         }];
-        
     }];
-    
-    
 }
 
 
