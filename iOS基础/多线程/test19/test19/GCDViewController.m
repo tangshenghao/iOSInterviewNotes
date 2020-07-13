@@ -79,9 +79,9 @@
 - (void)gcdRun {
     
     NSLog(@"0----- current Thread :%@", [NSThread currentThread]);
-//    // 同步执行加并发队列 没有开启新线程 串行进行
+    // 同步执行加并发队列 没有开启新线程 串行进行
 //    dispatch_queue_t queue = dispatch_queue_create("com.tsh.concurrent1", DISPATCH_QUEUE_CONCURRENT);
-//
+
 //    dispatch_sync(queue, ^{
 //        NSLog(@"1----- current Thread :%@", [NSThread currentThread]);
 //    });
@@ -94,7 +94,7 @@
 //        NSLog(@"3----- current Thread :%@", [NSThread currentThread]);
 //    });
     
-//    // 异步执行加并发队列 开启新线程 并发进行
+    // 异步执行加并发队列 开启新线程 并发进行
 //    dispatch_queue_t queue = dispatch_queue_create("com.tsh.concurrent1", DISPATCH_QUEUE_CONCURRENT);
 //
 //    dispatch_async(queue, ^{
@@ -109,7 +109,7 @@
 //        NSLog(@"3----- current Thread :%@", [NSThread currentThread]);
 //    });
     
-//    // 同步执行加串行队列 不开启新线程 顺序进行
+    // 同步执行加串行队列 不开启新线程 顺序进行
 //    dispatch_queue_t queue = dispatch_queue_create("com.tsh.concurrent1", DISPATCH_QUEUE_SERIAL);
 //
 //    dispatch_sync(queue, ^{
@@ -124,7 +124,7 @@
 //        NSLog(@"3----- current Thread :%@", [NSThread currentThread]);
 //    });
     
-//    // 异步执行加串行队列 开启1个线程 顺序进行
+    // 异步执行加串行队列 开启1个线程 顺序进行
 //    dispatch_queue_t queue = dispatch_queue_create("com.tsh.concurrent1", DISPATCH_QUEUE_SERIAL);
 //
 //    dispatch_async(queue, ^{
@@ -174,15 +174,15 @@
     // 异步执行加主队列 不开启线程 顺序执行
     dispatch_queue_t queue = dispatch_get_main_queue();
 
-    
+
     dispatch_async(queue, ^{
         NSLog(@"1----- current Thread :%@", [NSThread currentThread]);
     });
-    
+
     dispatch_async(queue, ^{
         NSLog(@"2----- current Thread :%@", [NSThread currentThread]);
     });
-    
+
     dispatch_async(queue, ^{
         NSLog(@"3----- current Thread :%@", [NSThread currentThread]);
     });
@@ -272,8 +272,6 @@
     NSLog(@"group begin thread:%@", [NSThread currentThread]);
     dispatch_group_t group = dispatch_group_create();
     
-    
-    
 //    dispatch_group_async(group, dispatch_get_global_queue(0, 0), ^{
 //        NSLog(@"1----- current Thread :%@", [NSThread currentThread]);
 //    });
@@ -282,7 +280,7 @@
 //        NSLog(@"2----- current Thread :%@", [NSThread currentThread]);
 //    });
     
-    //使用Notify
+//    // 使用Notify
 //    dispatch_group_notify(group, dispatch_get_main_queue(), ^{
 //        NSLog(@"3----- current Thread :%@", [NSThread currentThread]);
 //        NSLog(@"group end");
@@ -294,19 +292,19 @@
 //    NSLog(@"group end");
     
     
-    //使用enter 和 leave
+    // 使用enter 和 leave
     dispatch_group_enter(group);
     dispatch_async(dispatch_get_global_queue(0, 0), ^{
         NSLog(@"1----- current Thread :%@", [NSThread currentThread]);
         dispatch_group_leave(group);
     });
-    
+
     dispatch_group_enter(group);
     dispatch_async(dispatch_get_global_queue(0, 0), ^{
         NSLog(@"2----- current Thread :%@", [NSThread currentThread]);
         dispatch_group_leave(group);
     });
-    
+
     dispatch_group_notify(group, dispatch_get_main_queue(), ^{
         NSLog(@"3----- current Thread :%@", [NSThread currentThread]);
         NSLog(@"group end");
@@ -334,16 +332,16 @@
     
     // 线程加锁
     self.semaphore = dispatch_semaphore_create(1);
-    
+
     dispatch_queue_t queue1 = dispatch_queue_create("com.tsh.serial1", DISPATCH_QUEUE_SERIAL);
     dispatch_queue_t queue2 = dispatch_queue_create("com.tsh.serial2", DISPATCH_QUEUE_SERIAL);
-    
+
     self.ticketCount = 50;
-    
+
     dispatch_async(queue1, ^{
         [self buyTicket];
     });
-    
+
     dispatch_async(queue2, ^{
         [self buyTicket];
     });
