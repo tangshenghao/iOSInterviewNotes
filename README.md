@@ -30,7 +30,7 @@ iOS面试的准备、知识点的积累
 * [category与extension](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/iOS%E5%9F%BA%E7%A1%80/category%E5%92%8Cextension/category%E5%92%8Cextension.md)
 * [响应链](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/iOS%E5%9F%BA%E7%A1%80/%E5%93%8D%E5%BA%94%E9%93%BE/%E5%93%8D%E5%BA%94%E9%93%BE.md)
 * [多线程](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/iOS%E5%9F%BA%E7%A1%80/%E5%A4%9A%E7%BA%BF%E7%A8%8B/%E5%A4%9A%E7%BA%BF%E7%A8%8B.md)
-* 锁
+* [锁](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/iOS%E5%9F%BA%E7%A1%80/%E9%94%81/%E9%94%81.md)
 * [WKWebView](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/iOS%E5%9F%BA%E7%A1%80/WKWebView%E6%95%B4%E7%90%86/WKWebView.md)
 
 ## 网络基础
