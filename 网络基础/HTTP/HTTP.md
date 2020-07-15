@@ -1,4 +1,4 @@
-## HTTP「
+## HTTP
 
 ### 1 Web的显示
 
@@ -32,13 +32,13 @@ TCP/IP协议族按层次分为如下4层：应用层、传输层、网络层和�
 
 如图：
 
-
+![](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/HTTP/TCP:IP%E5%88%86%E5%B1%82%E7%BB%93%E6%9E%84.jpg?raw=true)
 
 发送端在层与层之间传输数据时，每经过一层时必定会打上一个该层所属的首部信息，反之，接收端在层与层传输数据时，每经过一层会把对应的首部消去。
 
 如图：
 
-
+![](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/HTTP/HTTP%E5%88%86%E5%B1%82%E4%BC%A0%E8%BE%93.jpg?raw=true)
 
 #### 1.3 负责传输的IP协议
 
@@ -70,9 +70,15 @@ URL（统一资源定位符）：使用Web浏览器等访问Web页面时需要�
 
 HTTP协议用于客户端和服务器的通信，HTTP协议规定，请求从客户端发出，最后服务端响应该请求并返回。
 
+POST表示请求访问服务器的类型，称为方法。随后的字符串指明了请求访问的资源对象，也叫做请求URI，最后是HTTP版本号。
+
 请求报文的构成：
 
-POST表示请求访问服务器的类型，称为方法。随后的字符串指明了请求访问的资源对象，也叫做请求URI，最后是HTTP版本号。
+![](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/HTTP/POST%E6%96%B9%E6%B3%95%E8%AF%B7%E6%B1%82.jpg?raw=true)
+
+响应报文的构成：
+
+![](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/HTTP/POST%E6%96%B9%E6%B3%95%E5%93%8D%E5%BA%94.jpg?raw=true)
 
 <br />
 
