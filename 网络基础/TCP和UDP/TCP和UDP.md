@@ -20,7 +20,7 @@ TCP协议全称：传输控制协议。
 
 过程如图：
 
-
+![](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/TCP%E5%92%8CUDP/TCP%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B.jpg?raw=true)
 
 第一次：
 
@@ -64,7 +64,7 @@ TCP协议全称：传输控制协议。
 
 过程如图：
 
-
+![](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/TCP%E5%92%8CUDP/TCP%E5%9B%9B%E6%AC%A1%E6%8C%A5%E6%89%8B.jpg?raw=true)
 
 详细的流程如下：
 
