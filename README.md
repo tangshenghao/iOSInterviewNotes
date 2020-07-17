@@ -40,8 +40,8 @@ iOS面试的准备、知识点的积累
 
 ## 架构
 
-* MVC
-* MVVM
+* [MVC](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/%E6%9E%B6%E6%9E%84/MVC/MVC.md)
+* [MVVM](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/%E6%9E%B6%E6%9E%84/MVVM/MVVM.md)
 * 组件化
 
 ## 设计模式

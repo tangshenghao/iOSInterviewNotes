@@ -10,7 +10,13 @@ View：视图对象是用户可以看到的应用程序中的对象。
 
 Controller：控制器对象充当应用程序的一个或多个视图对象与其一个或多个模型对象之间的中介。因此控制器对象是视图对象通过其获取模型对象的变化的通道，反之依然。控制器对象还可以为应用程序执行设置和调度任务，并管理其他对象的生命周期。
 
+苹果官方的MVP架构图：
 
+![](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/%E6%9E%B6%E6%9E%84/MVC/MVC%E6%A1%86%E6%9E%B6.jpg?raw=true)
+
+斯坦福公开课的MVP架构图：
+
+![](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/%E6%9E%B6%E6%9E%84/MVC/MVC%E6%96%AF%E5%9D%A6%E7%A6%8F%E5%85%AC%E5%BC%80%E8%AF%BE.jpg?raw=true)
 
 ### 2 Controller的臃肿问题
 
@@ -29,7 +35,7 @@ Controller：控制器对象充当应用程序的一个或多个视图对象与�
 
 但是一般都比较难做到这一点，因为很多逻辑都不知道写在哪里的时候，于是就都写到了Controller中。
 
-
+<br />
 
 ### 3 对Controller瘦身
 
@@ -45,7 +51,7 @@ Controller：控制器对象充当应用程序的一个或多个视图对象与�
 
 方便做对象的持久化。
 
-
+<br />
 
 #### 3.2 将页面的拼装抽象到专门的类中
 
@@ -55,7 +61,7 @@ Controller：控制器对象充当应用程序的一个或多个视图对象与�
 
 用一个静态的Util类，帮助你做UIView的拼装工作。但这种方式稍微做得不太彻底，但是比较简单。
 
-
+<br />
 
 #### 3.3 构造ViewModel
 
@@ -65,7 +71,7 @@ Controller：控制器对象充当应用程序的一个或多个视图对象与�
 
 可以创建构造ViewModel的工厂类，参见工厂模式。另外也可以专门将数据存取都抽到一个Service层，由这层来提供ViewModel的获取。
 
-
+<br />
 
 #### 3.4 专门构造存储类
 
@@ -77,10 +83,12 @@ Controller：控制器对象充当应用程序的一个或多个视图对象与�
 
 通过以上的处理，可以将MVC设计模式中的ViewController进一步拆分，构造出网络请求层、ViewModel层、Service层、Storage层等其他类，来配合Controller工作，从而使Controller更加简单。
 
-
+<br />
 
 ### 4 总结
 
 通常项目中，时间一久，就会越来越多的逻辑直接写到ViewController中，所以需要时不时的review代码，做好管控，才可以不让项目规范越来越偏离正轨。
 
 封装好View和Model，抽象出可以复用的逻辑，尽量制作成通用的版式，方便开发人员调用和理解。在Controller层也处理好几块逻辑的拆分处理。
+
+<br />
