@@ -42,13 +42,13 @@ iOS面试的准备、知识点的积累
 
 * [MVC](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/%E6%9E%B6%E6%9E%84/MVC/MVC.md)
 * [MVVM](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/%E6%9E%B6%E6%9E%84/MVVM/MVVM.md)
-* 组件化
+* [组件化](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/%E6%9E%B6%E6%9E%84/%E7%BB%84%E4%BB%B6%E5%8C%96/%E7%BB%84%E4%BB%B6%E5%8C%96.md)
 
 ## 设计模式
 
-* 单例模式
-* 代理模式
-* 工厂模式
+* [单例模式](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F.md)
+* [观察者模式](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F/%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F.md)
+* [工厂模式](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F.md)
 
 ## 第三方库
 
