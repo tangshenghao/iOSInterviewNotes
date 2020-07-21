@@ -4,9 +4,11 @@
 
 SDWebImage实现了异步下载图片并且支持缓存的功能。框架的接口调用非常简洁，是iOS开发工程师基本都会使用的第三方框架。
 
+该篇分析的源码版本是5.8.1。是写这篇文章时的最新版本。
+
 整体的流程图如下：
 
-
+![](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/SDWebImage/SDWebImage%E6%B5%81%E7%A8%8B.jpg?raw=true)
 
 最简单的调用方式：
 
@@ -18,7 +20,7 @@ SDWebImage实现了异步下载图片并且支持缓存的功能。框架的接�
 
 框架的核心是SDWebImageManager，在外部有UIImageView+WebCache和UIbutton+WebCache为图片和按钮提供接口。内部通过SDWebImageManager负责处理和协调SDWebImageDownloader进行下载任务和SDWebImageCache负责关于缓存的相关任务。
 
-
+<br />
 
 #### 1.1 UIKit层
 
@@ -80,9 +82,11 @@ UIKit层是通过给定UIImageView、UIButton的分类来实现具体显示图�
                  completed:(nullable SDExternalCompletionBlock)completedBlock;
 ```
 
+<br />
+
 **UIImageView+Cache.m**
 
-通过实现文件看，实际上所有的接口最终都是指向sd_setImageWithURL:placeholderImage:options:context:方法。方法里面的实现是调用了sd_internalSetImageWithURL:的方法，该方法是UIView+WebCache中的实现。
+通过实现文件看，实际上所有的接口最终都是指向sd_setImageWithURL:placeholderImage:options:context:方法。方法里面的实现是调用了sd_internalSetImageWithURL:的方法，该方法是在UIView+WebCache中实现的。
 
 ```
 - (void)sd_setImageWithURL:(nullable NSURL *)url {
@@ -136,4 +140,178 @@ UIKit层是通过给定UIImageView、UIButton的分类来实现具体显示图�
                            }];
 }
 ```
+
+<br />
+
+**UIButton+WebCache**
+
+UIButton+WebCache内的实现与UIImageView+WebCache的实现方式基本一致，只是多了用字典来存储每个button的state的对应的URL等数据。然后分别实现了设置UIButton的image和backgroundImage的两个方式的接口。
+
+<br />
+
+**UIView+WebCache**
+
+上述两个分类的实现最终都会到该分类中实现。
+
+具体的实现代码如下：
+
+省略了部分代码
+
+```
+- (void)sd_internalSetImageWithURL:(nullable NSURL *)url
+                  placeholderImage:(nullable UIImage *)placeholder
+                           options:(SDWebImageOptions)options
+                           context:(nullable SDWebImageContext *)context
+                     setImageBlock:(nullable SDSetImageBlock)setImageBlock
+                          progress:(nullable SDImageLoaderProgressBlock)progressBlock
+                         completed:(nullable SDInternalCompletionBlock)completedBlock {
+    
+    //省略
+    .......
+    
+    // 此处是获取valid key
+    NSString *validOperationKey = context[SDWebImageContextSetImageOperationKey];
+    if (!validOperationKey) {
+        // pass through the operation key to downstream, which can used for tracing operation or image view class
+        validOperationKey = NSStringFromClass([self class]);
+        SDWebImageMutableContext *mutableContext = [context mutableCopy];
+        mutableContext[SDWebImageContextSetImageOperationKey] = validOperationKey;
+        context = [mutableContext copy];
+    }
+    self.sd_latestOperationKey = validOperationKey;
+    
+    // 确保没有正在进行的异步下载操作
+    [self sd_cancelImageLoadOperationWithKey:validOperationKey];
+    self.sd_imageURL = url;
+    
+    // 设置临时占位图
+    if (!(options & SDWebImageDelayPlaceholder)) {
+        dispatch_main_async_safe(^{
+            [self sd_setImage:placeholder imageData:nil basedOnClassOrViaCustomSetImageBlock:setImageBlock cacheType:SDImageCacheTypeNone imageURL:url];
+        });
+    }
+    
+    //如果url存在
+    if (url) {
+   
+        // reset the progress 重置进度属性
+        NSProgress *imageProgress = objc_getAssociatedObject(self, @selector(sd_imageProgress));
+        if (imageProgress) {
+            imageProgress.totalUnitCount = 0;
+            imageProgress.completedUnitCount = 0;
+        }
+        
+        // 开启Indicator 显示加载中
+#if SD_UIKIT || SD_MAC
+        // check and start image indicator
+        [self sd_startImageIndicator];
+        id<SDWebImageIndicator> imageIndicator = self.sd_imageIndicator;
+#endif
+				// 获取核心管理类manager
+        SDWebImageManager *manager = context[SDWebImageContextCustomManager];
+        if (!manager) {
+            manager = [SDWebImageManager sharedManager];
+        } else {
+            // remove this manager to avoid retain cycle (manger -> loader -> operation -> context -> manager)
+            SDWebImageMutableContext *mutableContext = [context mutableCopy];
+            mutableContext[SDWebImageContextCustomManager] = nil;
+            context = [mutableContext copy];
+        }
+        
+        // 定义进度block 省略
+        ......
+        
+        // 进行下载操作
+        @weakify(self);
+        id <SDWebImageOperation> operation = [manager loadImageWithURL:url options:options context:context progress:combinedProgressBlock completed:^(UIImage *image, NSData *data, NSError *error, SDImageCacheType cacheType, BOOL finished, NSURL *imageURL) {
+            @strongify(self);
+            if (!self) { return; }
+            // if the progress not been updated, mark it to complete state
+            if (imageProgress && finished && !error && imageProgress.totalUnitCount == 0 && imageProgress.completedUnitCount == 0) {
+                imageProgress.totalUnitCount = SDWebImageProgressUnitCountUnknown;
+                imageProgress.completedUnitCount = SDWebImageProgressUnitCountUnknown;
+            }
+            
+#if SD_UIKIT || SD_MAC
+            // check and stop image indicator
+            if (finished) {
+                [self sd_stopImageIndicator];
+            }
+#endif
+            
+            BOOL shouldCallCompletedBlock = finished || (options & SDWebImageAvoidAutoSetImage);
+            BOOL shouldNotSetImage = ((image && (options & SDWebImageAvoidAutoSetImage)) ||
+                                      (!image && !(options & SDWebImageDelayPlaceholder)));
+            SDWebImageNoParamsBlock callCompletedBlockClojure = ^{
+                if (!self) { return; }
+                if (!shouldNotSetImage) {
+                    [self sd_setNeedsLayout];
+                }
+                if (completedBlock && shouldCallCompletedBlock) {
+                    completedBlock(image, data, error, cacheType, finished, url);
+                }
+            };
+            
+            // case 1a: we got an image, but the SDWebImageAvoidAutoSetImage flag is set
+            // OR
+            // case 1b: we got no image and the SDWebImageDelayPlaceholder is not set
+            if (shouldNotSetImage) {
+                dispatch_main_async_safe(callCompletedBlockClojure);
+                return;
+            }
+            
+            // 设置图片 省略
+            .....
+            
+            dispatch_main_async_safe(^{
+								// 调用设置图片
+                [self sd_setImage:targetImage imageData:targetData basedOnClassOrViaCustomSetImageBlock:setImageBlock transition:transition cacheType:cacheType imageURL:imageURL];
+
+                callCompletedBlockClojure();
+            });
+        }];
+        [self sd_setImageLoadOperation:operation forKey:validOperationKey];
+    } else {
+				// 返回异常error回调
+    }
+}
+
+// 设置图片
+- (void)sd_setImage:(UIImage *)image imageData:(NSData *)imageData basedOnClassOrViaCustomSetImageBlock:(SDSetImageBlock)setImageBlock transition:(SDWebImageTransition *)transition cacheType:(SDImageCacheType)cacheType imageURL:(NSURL *)imageURL {
+    UIView *view = self;
+    SDSetImageBlock finalSetImageBlock;
+    // 如果外部实现了setImageBlock则直接返回
+    if (setImageBlock) {
+        finalSetImageBlock = setImageBlock;
+    } else if ([view isKindOfClass:[UIImageView class]]) {
+    // 如果没实现，则判断调用的类是不是UIImageView或者UIButton，并直接对image进行赋值
+        UIImageView *imageView = (UIImageView *)view;
+        finalSetImageBlock = ^(UIImage *setImage, NSData *setImageData, SDImageCacheType setCacheType, NSURL *setImageURL) {
+            imageView.image = setImage;
+        };
+    }
+    else if ([view isKindOfClass:[UIButton class]]) {
+        UIButton *button = (UIButton *)view;
+        finalSetImageBlock = ^(UIImage *setImage, NSData *setImageData, SDImageCacheType setCacheType, NSURL *setImageURL) {
+            [button setImage:setImage forState:UIControlStateNormal];
+        };
+    }
+
+
+    // 设置图片转场效果
+    if (transition) {
+				// 省略
+    } else {
+        if (finalSetImageBlock) {
+            finalSetImageBlock(image, imageData, cacheType, imageURL);
+        }
+    }
+}
+```
+
+其中sd_setImageLoadOperation这个操作，是对应的一个将operation对象存储到一个MapTable中，这个是有一个专门的UIView+WebCacheOperation分类来实现的，该类专门管理了operation MapTable的插入、获取、取消和移除操作。
+
+以上就是UIKit层的内容。
+
+<br />
 
