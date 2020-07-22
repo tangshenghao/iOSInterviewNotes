@@ -4,7 +4,7 @@
 
 SDWebImage实现了异步下载图片并且支持缓存的功能。框架的接口调用非常简洁，是iOS开发工程师基本都会使用的第三方框架。
 
-该篇分析的源码版本是5.8.1。是写这篇文章时的最新版本。
+该篇分析的源码版本是5.8.1。是写这篇文章时的最新版本。相比4.x。5.x加了很多代码和文件，可能分析得不是特别细。
 
 整体的流程图如下：
 
@@ -201,7 +201,7 @@ UIButton+WebCache内的实现与UIImageView+WebCache的实现方式基本一致�
             imageProgress.completedUnitCount = 0;
         }
         
-        // 开启Indicator 显示加载中
+        // 开启Indicator 显示状态栏的加载中
 #if SD_UIKIT || SD_MAC
         // check and start image indicator
         [self sd_startImageIndicator];
@@ -314,4 +314,116 @@ UIButton+WebCache内的实现与UIImageView+WebCache的实现方式基本一致�
 以上就是UIKit层的内容。
 
 <br />
+
+#### 1.2 工具层
+
+上节说到SDWebImageManager负责处理和协调SDWebImageDownloader进行下载任务和SDWebImageCache负责关于缓存的相关任务。
+
+先看看SDWebImageManager这个类。最主要的就是在UIView+WebCache中调用的下载图片接口，实现代码如下：
+
+```
+- (SDWebImageCombinedOperation *)loadImageWithURL:(nullable NSURL *)url
+                                          options:(SDWebImageOptions)options
+                                          context:(nullable SDWebImageContext *)context
+                                         progress:(nullable SDImageLoaderProgressBlock)progressBlock
+                                        completed:(nonnull SDInternalCompletionBlock)completedBlock {
+    // Invoking this method without a completedBlock is pointless
+    NSAssert(completedBlock != nil, @"If you mean to prefetch the image, use -[SDWebImagePrefetcher prefetchURLs] instead");
+
+    // Very common mistake is to send the URL using NSString object instead of NSURL. For some strange reason, Xcode won't
+    // throw any warning for this type mismatch. Here we failsafe this error by allowing URLs to be passed as NSString.
+    if ([url isKindOfClass:NSString.class]) {
+        url = [NSURL URLWithString:(NSString *)url];
+    }
+
+    // Prevents app crashing on argument type error like sending NSNull instead of NSURL
+    if (![url isKindOfClass:NSURL.class]) {
+        url = nil;
+    }
+		
+    SDWebImageCombinedOperation *operation = [SDWebImageCombinedOperation new];
+    operation.manager = self;
+
+    BOOL isFailedUrl = NO;
+    if (url) {
+        SD_LOCK(self.failedURLsLock);
+        isFailedUrl = [self.failedURLs containsObject:url];
+        SD_UNLOCK(self.failedURLsLock);
+    }
+
+    if (url.absoluteString.length == 0 || (!(options & SDWebImageRetryFailed) && isFailedUrl)) {
+        NSString *description = isFailedUrl ? @"Image url is blacklisted" : @"Image url is nil";
+        NSInteger code = isFailedUrl ? SDWebImageErrorBlackListed : SDWebImageErrorInvalidURL;
+        [self callCompletionBlockForOperation:operation completion:completedBlock error:[NSError errorWithDomain:SDWebImageErrorDomain code:code userInfo:@{NSLocalizedDescriptionKey : description}] url:url];
+        return operation;
+    }
+
+    SD_LOCK(self.runningOperationsLock);
+    [self.runningOperations addObject:operation];
+    SD_UNLOCK(self.runningOperationsLock);
+    
+    // Preprocess the options and context arg to decide the final the result for manager
+    SDWebImageOptionsResult *result = [self processedResultForURL:url options:options context:context];
+    // 前面都是判断用 此处调用从缓存取图片
+    // Start the entry to load image from cache
+    [self callCacheProcessForOperation:operation url:url options:result.options context:result.context progress:progressBlock completed:completedBlock];
+
+    return operation;
+}
+
+
+// Query normal cache process
+- (void)callCacheProcessForOperation:(nonnull SDWebImageCombinedOperation *)operation
+                                 url:(nonnull NSURL *)url
+                             options:(SDWebImageOptions)options
+                             context:(nullable SDWebImageContext *)context
+                            progress:(nullable SDImageLoaderProgressBlock)progressBlock
+                           completed:(nullable SDInternalCompletionBlock)completedBlock {
+    // Grab the image cache to use
+    id<SDImageCache> imageCache;
+    if ([context[SDWebImageContextImageCache] conformsToProtocol:@protocol(SDImageCache)]) {
+        imageCache = context[SDWebImageContextImageCache];
+    } else {
+        imageCache = self.imageCache;
+    }
+    
+    // Get the query cache type
+    SDImageCacheType queryCacheType = SDImageCacheTypeAll;
+    if (context[SDWebImageContextQueryCacheType]) {
+        queryCacheType = [context[SDWebImageContextQueryCacheType] integerValue];
+    }
+    
+    // Check whether we should query cache
+    BOOL shouldQueryCache = !SD_OPTIONS_CONTAINS(options, SDWebImageFromLoaderOnly);
+    if (shouldQueryCache) {
+    
+    		//key是通过url生成的 里面有条件过滤或者是缩放和转换效果会影响到key 通常没有这些条件会是url地址作为key
+        NSString *key = [self cacheKeyForURL:url context:context];
+        @weakify(operation);
+    		// 执行取缓存的操作
+        operation.cacheOperation = [imageCache queryImageForKey:key options:options context:context cacheType:queryCacheType completion:^(UIImage * _Nullable cachedImage, NSData * _Nullable cachedData, SDImageCacheType cacheType) {
+            @strongify(operation);
+            if (!operation || operation.isCancelled) {
+                // Image combined operation cancelled by user
+                [self callCompletionBlockForOperation:operation completion:completedBlock error:[NSError errorWithDomain:SDWebImageErrorDomain code:SDWebImageErrorCancelled userInfo:@{NSLocalizedDescriptionKey : @"Operation cancelled by user during querying the cache"}] url:url];
+                [self safelyRemoveOperationFromRunning:operation];
+                return;
+            } else if (context[SDWebImageContextImageTransformer] && !cachedImage) {
+                // Have a chance to query original cache instead of downloading
+                [self callOriginalCacheProcessForOperation:operation url:url options:options context:context progress:progressBlock completed:completedBlock];
+                return;
+            }
+            // 继续上述判断后也会执行下载操作
+            // Continue download process
+            [self callDownloadProcessForOperation:operation url:url options:options context:context cachedImage:cachedImage cachedData:cachedData cacheType:cacheType progress:progressBlock completed:completedBlock];
+        }];
+    } else {
+    		// 没有找到缓存则去执行下载操作
+        // Continue download process
+        [self callDownloadProcessForOperation:operation url:url options:options context:context cachedImage:nil cachedData:nil cacheType:SDImageCacheTypeNone progress:progressBlock completed:completedBlock];
+    }
+}
+
+
+```
 
