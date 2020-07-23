@@ -574,12 +574,353 @@ UIButton+WebCache内的实现与UIImageView+WebCache的实现方式基本一致�
 
 ##### 1.2.1 SDImageCache
 
+在上小节的SDWebImageManager中，加载图片，最先会调用callCacheProcessForOperation，执行查询缓存的操作。对应的类是SDImageCache，来通过该类看一下缓存的流程。
 
+该类定义的属性：
+
+```
+// 内存缓存的类 - 遵循<SDMemoryCache>协议的类，默认是SDMemoryCache，用来做缓存读写处理
+@property (nonatomic, strong, readwrite, nonnull) id<SDMemoryCache> memoryCache;
+// 磁盘缓存的类 - 遵循<SDDiskCache>协议的类，默认是SDDiskCache，用来做磁盘读写处理
+@property (nonatomic, strong, readwrite, nonnull) id<SDDiskCache> diskCache;
+// 缓存的配置参数的文件
+@property (nonatomic, copy, readwrite, nonnull) SDImageCacheConfig *config;
+// 磁盘存储的路径
+@property (nonatomic, copy, readwrite, nonnull) NSString *diskCachePath;
+// 唯一的读写队列 会在初始化时生成穿行的读写队列
+@property (nonatomic, strong, nullable) dispatch_queue_t ioQueue;
+```
+
+实现文件中，较为重要的是读取流程，此时使用的是返回NSOperation来处理操作，使用NSOperation可以中途执行取消等操作以及存储到对应strong-weak的map中更方便的进行管理。
+
+```
+- (nullable NSOperation *)queryCacheOperationForKey:(nullable NSString *)key options:(SDImageCacheOptions)options context:(nullable SDWebImageContext *)context cacheType:(SDImageCacheType)queryCacheType done:(nullable SDImageCacheQueryCompletionBlock)doneBlock {
+    //省略...部分判断逻辑
+    
+    // First check the in-memory cache... 现在缓存中检查是否存在图片
+    UIImage *image;
+    if (queryCacheType != SDImageCacheTypeDisk) {
+        image = [self imageFromMemoryCacheForKey:key];
+    }
+    
+    if (image) {
+       	//省略 判断图片是否符合
+    }
+		
+		// 判断是否只读取缓存图片
+    BOOL shouldQueryMemoryOnly = (queryCacheType == SDImageCacheTypeMemory) || (image && !(options & SDImageCacheQueryMemoryData));
+    if (shouldQueryMemoryOnly) {
+        if (doneBlock) {
+            doneBlock(image, nil, SDImageCacheTypeMemory);
+        }
+        return nil;
+    }
+    
+    // Second check the disk cache... 检查硬盘中是否存在图片
+    NSOperation *operation = [NSOperation new];
+    // Check whether we need to synchronously query disk
+    // 1. in-memory cache hit & memoryDataSync
+    // 2. in-memory cache miss & diskDataSync
+    BOOL shouldQueryDiskSync = ((image && options & SDImageCacheQueryMemoryDataSync) ||
+                                (!image && options & SDImageCacheQueryDiskDataSync));
+    void(^queryDiskBlock)(void) =  ^{
+        if (operation.isCancelled) {
+            if (doneBlock) {
+                doneBlock(nil, nil, SDImageCacheTypeNone);
+            }
+            return;
+        }
+        
+        @autoreleasepool {
+        		// 获取磁盘中的图片数据
+            NSData *diskData = [self diskImageDataBySearchingAllPathsForKey:key];
+            UIImage *diskImage;
+            SDImageCacheType cacheType = SDImageCacheTypeNone;
+            if (image) {
+                // the image is from in-memory cache, but need image data
+                // 此处是上面缓存中的图片
+                diskImage = image;
+                cacheType = SDImageCacheTypeMemory;
+            } else if (diskData) {
+                cacheType = SDImageCacheTypeDisk;
+                // decode image data only if in-memory cache missed
+                // 如果缓存中没有找到图片，则将数据解码出image，然后存到缓存中
+                diskImage = [self diskImageForKey:key data:diskData options:options context:context];
+                if (diskImage && self.config.shouldCacheImagesInMemory) {
+                    NSUInteger cost = diskImage.sd_memoryCost;
+                    [self.memoryCache setObject:diskImage forKey:key cost:cost];
+                }
+            }
+            
+            if (doneBlock) {
+                if (shouldQueryDiskSync) {
+                    doneBlock(diskImage, diskData, cacheType);
+                } else {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        doneBlock(diskImage, diskData, cacheType);
+                    });
+                }
+            }
+        }
+    };
+    
+    // Query in ioQueue to keep IO-safe
+    if (shouldQueryDiskSync) {
+        dispatch_sync(self.ioQueue, queryDiskBlock);
+    } else {
+        dispatch_async(self.ioQueue, queryDiskBlock);
+    }
+    
+    return operation;
+}
+```
+
+在退到后台时，该类会申请一小段时间的后台任务来执行删除已经超时缓存的处理
+
+```
+- (void)applicationDidEnterBackground:(NSNotification *)notification {
+    if (!self.config.shouldRemoveExpiredDataWhenEnterBackground) {
+        return;
+    }
+    Class UIApplicationClass = NSClassFromString(@"UIApplication");
+    if(!UIApplicationClass || ![UIApplicationClass respondsToSelector:@selector(sharedApplication)]) {
+        return;
+    }
+    UIApplication *application = [UIApplication performSelector:@selector(sharedApplication)];
+    __block UIBackgroundTaskIdentifier bgTask = [application beginBackgroundTaskWithExpirationHandler:^{
+        // Clean up any unfinished task business by marking where you
+        // stopped or ending the task outright.
+        [application endBackgroundTask:bgTask];
+        bgTask = UIBackgroundTaskInvalid;
+    }];
+
+    // Start the long-running task and return immediately.
+    [self deleteOldFilesWithCompletionBlock:^{
+        [application endBackgroundTask:bgTask];
+        bgTask = UIBackgroundTaskInvalid;
+    }];
+}
+```
+
+其中相别于旧版的处理缓存和磁盘的两个默认的类SDMemoryCache和SDDiskCache。
+
+**SDMemoryCache**
+
+SDMemoryCache是NSCache的子类，说明SDWebImage使用的是系统的NSCahce类来处理缓存，同时定义了SDMemoryCache的协议，将NSCache中的方法在协议中定义，可以实现自定义的类实现代理方法来管理缓存。
+
+其中除了系统的NSCache的功能外，该类内部还通过弱引用的NSMapTable来做双重缓存的处理，在保存等操作中也会在NSMapTable中进行同样的操作。
+
+```
+- (void)setObject:(id)obj forKey:(id)key cost:(NSUInteger)g {
+    [super setObject:obj forKey:key cost:g];
+    // 判断有没有使用弱引用内存 默认是yes
+    if (!self.config.shouldUseWeakMemoryCache) {
+        return;
+    }
+    if (key && obj) {
+        // Store weak cache
+        SD_LOCK(self.weakCacheLock);
+        [self.weakCache setObject:obj forKey:key];
+        SD_UNLOCK(self.weakCacheLock);
+    }
+}
+```
+
+采用NSMapTable是优化了，系统的NSCache会在某些情况下自动对缓存进行清除，而需要重新获取磁盘或者去网络重新下载，引起图片闪烁等问题。
+
+**SDDiskCache**
+
+SDDiskCache是用于对磁盘缓存文件进行处理的类，也是定义了SDDiskCache的协议，可以实现自定义的类来管理。实现文件内主要是通过NSFileManager对磁盘进行处理。同时在进入后台或者终止时去检查是否有过期的缓存文件，默认过期是1个星期。
 
 <br />
 
 ##### 1.2.2 SDWebImageDownloader
 
+接着看SDWebImageDownloader，该类负责处理图片下载。在头文件中定义了名为SDImageLoader的分类并遵循了SDImageLoader协议，因为在新版中SDWebImageManager中，是可以采用自定义的类来实现对应的下载功能，但是前提是需要遵循SDImageLoader协议。
+
+其中该类最重要的就是下载方法downloadImageWithURL
+
+```
+- (nullable SDWebImageDownloadToken *)downloadImageWithURL:(nullable NSURL *)url
+                                                   options:(SDWebImageDownloaderOptions)options
+                                                   context:(nullable SDWebImageContext *)context
+                                                  progress:(nullable SDWebImageDownloaderProgressBlock)progressBlock
+                                                 completed:(nullable SDWebImageDownloaderCompletedBlock)completedBlock {
+    // The URL will be used as the key to the callbacks dictionary so it cannot be nil. If it is nil immediately call the completed block with no image or data. 判断是否为空 返回错误
+    if (url == nil) {
+        if (completedBlock) {
+            NSError *error = [NSError errorWithDomain:SDWebImageErrorDomain code:SDWebImageErrorInvalidURL userInfo:@{NSLocalizedDescriptionKey : @"Image url is nil"}];
+            completedBlock(nil, nil, error, YES);
+        }
+        return nil;
+    }
+    
+    SD_LOCK(self.operationsLock);
+    id downloadOperationCancelToken;
+    NSOperation<SDWebImageDownloaderOperation> *operation = [self.URLOperations objectForKey:url];
+    // There is a case that the operation may be marked as finished or cancelled, but not been removed from `self.URLOperations`.  省略 判断操作是否被中断或完成
+    if (!operation || operation.isFinished || operation.isCancelled) {
+        // 生成下载的operation
+    		operation = [self createDownloaderOperationWithUrl:url options:options context:context];
+    		// 省略异常判断和成功回调
+    		[self.downloadQueue addOperation:operation];
+    } else {
+        // 省略存在operation的处理操作
+    }
+    SD_UNLOCK(self.operationsLock);
+    
+    SDWebImageDownloadToken *token = [[SDWebImageDownloadToken alloc] initWithDownloadOperation:operation];
+    token.url = url;
+    token.request = operation.request;
+    token.downloadOperationCancelToken = downloadOperationCancelToken;
+    
+    return token;
+}
+// 创建下载操作
+- (nullable NSOperation<SDWebImageDownloaderOperation> *)createDownloaderOperationWithUrl:(nonnull NSURL *)url
+                                                                                  options:(SDWebImageDownloaderOptions)options
+                                                                                  context:(nullable SDWebImageContext *)context {
+                                                                                  //超时时间
+    NSTimeInterval timeoutInterval = self.config.downloadTimeout;
+    if (timeoutInterval == 0.0) {
+        timeoutInterval = 15.0;
+    }
+    
+    //省略部分逻辑判断及处理
+    // 处理NSURLRequest
+    NSURLRequest *request;
+    if (requestModifier) {
+        NSURLRequest *modifiedRequest = [requestModifier modifiedRequestWithRequest:[mutableRequest copy]];
+        // If modified request is nil, early return
+        if (!modifiedRequest) {
+            return nil;
+        } else {
+            request = [modifiedRequest copy];
+        }
+    } else {
+        request = [mutableRequest copy];
+    }
+    // Response Modifier
+    id<SDWebImageDownloaderResponseModifier> responseModifier;
+    if ([context valueForKey:SDWebImageContextDownloadResponseModifier]) {
+        responseModifier = [context valueForKey:SDWebImageContextDownloadResponseModifier];
+    } else {
+        responseModifier = self.responseModifier;
+    }
+    if (responseModifier) {
+        mutableContext[SDWebImageContextDownloadResponseModifier] = responseModifier;
+    }
+    // Decryptor
+    id<SDWebImageDownloaderDecryptor> decryptor;
+    if ([context valueForKey:SDWebImageContextDownloadDecryptor]) {
+        decryptor = [context valueForKey:SDWebImageContextDownloadDecryptor];
+    } else {
+        decryptor = self.decryptor;
+    }
+    if (decryptor) {
+        mutableContext[SDWebImageContextDownloadDecryptor] = decryptor;
+    }
+    
+    context = [mutableContext copy];
+    
+    // Operation Class
+    Class operationClass = self.config.operationClass;
+    if (operationClass && [operationClass isSubclassOfClass:[NSOperation class]] && [operationClass conformsToProtocol:@protocol(SDWebImageDownloaderOperation)]) {
+        // Custom operation class
+    } else {
+        operationClass = [SDWebImageDownloaderOperation class];
+    }
+    // 初始化下载的operation
+    NSOperation<SDWebImageDownloaderOperation> *operation = [[operationClass alloc] initWithRequest:request inSession:self.session options:options context:context];
+    
+    if ([operation respondsToSelector:@selector(setCredential:)]) {
+        if (self.config.urlCredential) {
+            operation.credential = self.config.urlCredential;
+        } else if (self.config.username && self.config.password) {
+            operation.credential = [NSURLCredential credentialWithUser:self.config.username password:self.config.password persistence:NSURLCredentialPersistenceForSession];
+        }
+    }
+        
+    if ([operation respondsToSelector:@selector(setMinimumProgressInterval:)]) {
+        operation.minimumProgressInterval = MIN(MAX(self.config.minimumProgressInterval, 0), 1);
+    }
+    
+    if (options & SDWebImageDownloaderHighPriority) {
+        operation.queuePriority = NSOperationQueuePriorityHigh;
+    } else if (options & SDWebImageDownloaderLowPriority) {
+        operation.queuePriority = NSOperationQueuePriorityLow;
+    }
+    
+    if (self.config.executionOrder == SDWebImageDownloaderLIFOExecutionOrder) {
+        // Emulate LIFO execution order by systematically, each previous adding operation can dependency the new operation
+        // This can gurantee the new operation to be execulated firstly, even if when some operations finished, meanwhile you appending new operations
+        // Just make last added operation dependents new operation can not solve this problem. See test case #test15DownloaderLIFOExecutionOrder
+        for (NSOperation *pendingOperation in self.downloadQueue.operations) {
+            [pendingOperation addDependency:operation];
+        }
+    }
+    
+    return operation;
+}
+```
+
+然后在SDWebImageDownloaderOperation中有下载的具体实现，通过初始化中的request获取dataTask后执行resume。
+
+以上就是主要流程，从UI层调用分类的接口，到manager类去查询缓存处理和未查询到缓存的执行下载处理，并最终返回回调到UI层中。
+
 <br />
 
-#### 1.3 图片解码器
+#### 1.3 零散的知识点
+
+其实除了上述的主要流程，还有框架对不同格式的图片解码处理、大图优化处理、动图优化处理。后续持续研究。
+
+这里选一些零散的知识点：
+
+##### 1.3.1 将对应的类定义换成id<协议>
+
+从上述流程中，发现了新版中很多属性中引用的类，从具体的某个类变成了id<协议>的形式，这是方便除了默认的实现类外还可以高度自定义，同时也可以在默认的类中加入更多的操作，从原本的调用中剥离出来。
+
+比如SDWebImageManager中对缓存工具的引用
+
+```
+@property (strong, nonatomic, readonly, nonnull) id<SDImageCache> imageCache;
+```
+
+通过协议定义了默认类中带有的方法，并设置为必须实现。所以自定义的类在使用时，都会实现这些方法，并且也可以在对应的地方代码调用时可以直接关联上对应函数。
+
+<br />
+
+##### 1.3.2 弱引用的MapTable
+
+在框架内使用了弱引用的map来给对象去除弱引用，并且可以在元素为nil时自动移除该元素，非常方便。
+
+```
+self.weakCache = [[NSMapTable alloc] initWithKeyOptions:NSPointerFunctionsStrongMemory valueOptions:NSPointerFunctionsWeakMemory capacity:0];
+```
+
+同时在操作时也要保证线程安全，所以读写操作都进行了加锁操作。项目中使用的信号量进行加锁。
+
+```
+...
+self.weakCacheLock = dispatch_semaphore_create(1);
+...
+SD_LOCK(self.weakCacheLock);
+[self.weakCache setObject:obj forKey:key];
+SD_UNLOCK(self.weakCacheLock);
+
+#ifndef SD_LOCK
+#define SD_LOCK(lock) dispatch_semaphore_wait(lock, DISPATCH_TIME_FOREVER);
+#endif
+
+#ifndef SD_UNLOCK
+#define SD_UNLOCK(lock) dispatch_semaphore_signal(lock);
+#endif
+```
+
+<br />
+
+##### 1.3.3 使用operation
+
+项目中的多线程操作基本都是基于NSOperation，因为更方便管理和做判断等，大量的操作内部都会判断operation是否存在或者结束、暂停等。同时也方便外部对其执行优先级变更、取消等操作。
+
+<br />
