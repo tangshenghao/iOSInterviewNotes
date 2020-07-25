@@ -118,3 +118,65 @@ AFNetworking从文件夹上分为了五个模块，如下：
 @property (nonatomic, strong, nullable) dispatch_group_t completionGroup;
 ```
 
+实现文件中，重要的是实现网络请求的方法
+
+```
+- (NSURLSessionDataTask *)dataTaskWithRequest:(NSURLRequest *)request
+                               uploadProgress:(nullable void (^)(NSProgress *uploadProgress)) uploadProgressBlock
+                             downloadProgress:(nullable void (^)(NSProgress *downloadProgress)) downloadProgressBlock
+                            completionHandler:(nullable void (^)(NSURLResponse *response, id _Nullable responseObject,  NSError * _Nullable error))completionHandler {
+
+		// 通过session和request生成task
+    NSURLSessionDataTask *dataTask = [self.session dataTaskWithRequest:request];
+		// 将task和回调block绑定到task的代理中
+    [self addDelegateForDataTask:dataTask uploadProgress:uploadProgressBlock downloadProgress:downloadProgressBlock completionHandler:completionHandler];
+
+    return dataTask;
+}
+
+- (void)addDelegateForDataTask:(NSURLSessionDataTask *)dataTask
+                uploadProgress:(nullable void (^)(NSProgress *uploadProgress)) uploadProgressBlock
+              downloadProgress:(nullable void (^)(NSProgress *downloadProgress)) downloadProgressBlock
+             completionHandler:(void (^)(NSURLResponse *response, id responseObject, NSError *error))completionHandler
+{
+
+		// 生成对应的task管理类
+    AFURLSessionManagerTaskDelegate *delegate = [[AFURLSessionManagerTaskDelegate alloc] initWithTask:dataTask];
+    delegate.manager = self;
+    delegate.completionHandler = completionHandler;
+
+    dataTask.taskDescription = self.taskDescriptionForSessionTasks;
+    // 通过dataTask设置代理类
+    [self setDelegate:delegate forTask:dataTask];
+		// 指定上传和下载回调block
+    delegate.uploadProgressBlock = uploadProgressBlock;
+    delegate.downloadProgressBlock = downloadProgressBlock;
+}
+
+// 设置task代理类
+- (void)setDelegate:(AFURLSessionManagerTaskDelegate *)delegate
+            forTask:(NSURLSessionTask *)task
+{
+    // 判断是否空异常
+    NSParameterAssert(task);
+    NSParameterAssert(delegate);
+		// 加锁
+    [self.lock lock];
+    // 通过taskIdentifier为key存储task代理类
+    self.mutableTaskDelegatesKeyedByTaskIdentifier[@(task.taskIdentifier)] = delegate;
+    // 给task添加监听
+    [self addNotificationObserverForTask:task];
+    [self.lock unlock];
+}
+```
+
+其中AFURLSessionManagerTaskDelegate负责了AFURLSessionManager中监听的NSURLSession的一些代理实现和回调的业务逻辑。
+
+dataTaskWithRequest的方法返回生成的task，回到AFHTTPSessionManager将调用
+
+```
+[dataTask resume];
+```
+
+触发HTTP请求调用。
+
