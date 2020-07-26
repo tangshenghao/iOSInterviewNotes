@@ -242,3 +242,178 @@ typedef NS_ENUM(NSInteger, AFNetworkReachabilityStatus) {
 
 #### 1.4 网络安全模块
 
+该模块只有AFSecurityPolicy一个类，具体实现的功能时完成HTTPS认证，是对系统库<Security/Security.h>的进一步封装。AFNetWorking的默认证书认证流程是客户端单项认证，加入需要双向验证，则服务器和客户端都需要发送数字证书给对方验证，需要用户自行实现。
+
+AFSecurityPolicy的三种验证模式
+
+```
+typedef NS_ENUM(NSUInteger, AFSSLPinningMode) {
+    AFSSLPinningModeNone,  			  // 无条件信任服务器的证书
+    AFSSLPinningModePublicKey,	  // 会对服务器返回的证书种的PublicKey进行验证
+    AFSSLPinningModeCertificate,	// 会对服务器返回的证书同本地证书全部进行验证
+};
+```
+
+然后头文件包含以下属性
+
+```
+// 返回SSL Pinning的类型，默认是AFSSLPinningModeNone
+@property (readonly, nonatomic, assign) AFSSLPinningMode SSLPinningMode;
+
+// 保存所有可用做校验证书的集合，evaluateServerTrush:forDomain:就会返回true，表示通过校验
+@property (nonatomic, strong, nullable) NSSet <NSData *> *pinnedCertificates;
+
+// 允许使用无效或过期的证书，默认是NO不允许
+@property (nonatomic, assign) BOOL allowInvalidCertificates;
+
+// 是否校验证书种的域名，默认是YES
+@property (nonatomic, assign) BOOL validatesDomainName;
+```
+
+以下是在AFURLSessionManager中实现的证书挑战代码
+
+```
+- (void)URLSession:(NSURLSession *)session
+              task:(NSURLSessionTask *)task
+didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
+ completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition disposition, NSURLCredential *credential))completionHandler
+{
+    BOOL evaluateServerTrust = NO;
+    // 默认类型
+    NSURLSessionAuthChallengeDisposition disposition = NSURLSessionAuthChallengePerformDefaultHandling;
+    NSURLCredential *credential = nil;
+    // 是否实现自定义的验证流程
+    if (self.authenticationChallengeHandler) {
+        
+        id result = self.authenticationChallengeHandler(session, task, challenge, completionHandler);
+        if (result == nil) {
+            return;
+        } else if ([result isKindOfClass:NSError.class]) {
+            objc_setAssociatedObject(task, AuthenticationChallengeErrorKey, result, OBJC_ASSOCIATION_RETAIN);
+            // 错误 取消挑战 取消连接
+            disposition = NSURLSessionAuthChallengeCancelAuthenticationChallenge;
+        } else if ([result isKindOfClass:NSURLCredential.class]) {
+        		// 证书挑战
+            credential = result;
+            disposition = NSURLSessionAuthChallengeUseCredential;
+        } else if ([result isKindOfClass:NSNumber.class]) {
+            disposition = [result integerValue];
+            NSAssert(disposition == NSURLSessionAuthChallengePerformDefaultHandling || disposition == NSURLSessionAuthChallengeCancelAuthenticationChallenge || disposition == NSURLSessionAuthChallengeRejectProtectionSpace, @"");
+            // 获取服务器验证方式
+            evaluateServerTrust = disposition == NSURLSessionAuthChallengePerformDefaultHandling && [challenge.protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust];
+        } else {
+            @throw [NSException exceptionWithName:@"Invalid Return Value" reason:@"The return value from the authentication challenge handler must be nil, an NSError, an NSURLCredential or an NSNumber." userInfo:nil];
+        }
+    } else {
+    		// 获取服务器验证方式
+        evaluateServerTrust = [challenge.protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust];
+    }
+	
+    if (evaluateServerTrust) {
+        if ([self.securityPolicy evaluateServerTrust:challenge.protectionSpace.serverTrust forDomain:challenge.protectionSpace.host]) {
+        		// 证书挑战
+            disposition = NSURLSessionAuthChallengeUseCredential;
+            credential = [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust];
+        } else {
+            objc_setAssociatedObject(task, AuthenticationChallengeErrorKey,
+                                     [self serverTrustErrorForServerTrust:challenge.protectionSpace.serverTrust url:task.currentRequest.URL],
+                                     OBJC_ASSOCIATION_RETAIN);
+            // 取消挑战，取消连接
+            disposition = NSURLSessionAuthChallengeCancelAuthenticationChallenge;
+        }
+    }
+		// 完成挑战，将信任凭证返回给服务器
+    if (completionHandler) {
+        completionHandler(disposition, credential);
+    }
+}
+```
+
+证书认证的核心代码如下：
+
+```
+- (BOOL)evaluateServerTrust:(SecTrustRef)serverTrust
+                  forDomain:(NSString *)domain
+{
+		// 异常情况判断
+    if (domain && self.allowInvalidCertificates && self.validatesDomainName && (self.SSLPinningMode == AFSSLPinningModeNone || [self.pinnedCertificates count] == 0)) {
+        NSLog(@"In order to validate a domain name for self signed certificates, you MUST use pinning.");
+        return NO;
+    }
+		// 创建安全策略，如果需要对域名进行验证，则创建附带入参域名的SSL安全策略，否则创建一个基于X.509的安全策略
+    NSMutableArray *policies = [NSMutableArray array];
+    if (self.validatesDomainName) {
+        [policies addObject:(__bridge_transfer id)SecPolicyCreateSSL(true, (__bridge CFStringRef)domain)];
+    } else {
+        [policies addObject:(__bridge_transfer id)SecPolicyCreateBasicX509()];
+    }
+	  // 将创建的安全策略加入到服务器给予的信任评估中，这个评估认证将会和本地的证书或者公钥进行评估得出结果
+    SecTrustSetPolicies(serverTrust, (__bridge CFArrayRef)policies);
+	  // AFSSLPinningModeNode的情况，不会进行公钥或证书的认证，只确保服务器的信任评估是否有效或者用户设置允许无效证书，那么也会直接返回通过。
+    if (self.SSLPinningMode == AFSSLPinningModeNone) {
+        return self.allowInvalidCertificates || AFServerTrustIsValid(serverTrust);
+    } else if (!self.allowInvalidCertificates && !AFServerTrustIsValid(serverTrust)) {
+        return NO;
+    }
+    // 不同模式的对应的认证
+    switch (self.SSLPinningMode) {
+        case AFSSLPinningModeCertificate: {
+        // 验证本地证书和服务器发过来的信任进行判断
+        // 这里本地使用的证书可能很多个，转换CFData存入
+            NSMutableArray *pinnedCertificates = [NSMutableArray array];
+            for (NSData *certificateData in self.pinnedCertificates) {
+                [pinnedCertificates addObject:(__bridge_transfer id)SecCertificateCreateWithData(NULL, (__bridge CFDataRef)certificateData)];
+            }
+            // 将pinnedCertificates设置成需要参与验证的锚点证书。
+            // 验证的数字证书是由锚点证书对应CA或CA签发的
+            // 是该证书本身，则信任该证书，调用SecTrustEvaluate来验证。
+            SecTrustSetAnchorCertificates(serverTrust, (__bridge CFArrayRef)pinnedCertificates);
+
+            if (!AFServerTrustIsValid(serverTrust)) {
+                return NO;
+            }
+
+            // obtain the chain after being validated, which *should* contain the pinned certificate in the last position (if it's the Root CA)
+            NSArray *serverCertificates = AFCertificateTrustChainForServerTrust(serverTrust);
+            // 连理证书链
+            for (NSData *trustChainCertificate in [serverCertificates reverseObjectEnumerator]) {
+            // 如果包含本地证书，说明是有效的
+                if ([self.pinnedCertificates containsObject:trustChainCertificate]) {
+                    return YES;
+                }
+            }
+            
+            return NO;
+        }
+        case AFSSLPinningModePublicKey: {
+            // 验证本地公钥和服务器发过来的信任证书进行判断
+            NSUInteger trustedPublicKeyCount = 0;
+            // 获取服务器公钥链
+            NSArray *publicKeys = AFPublicKeyTrustChainForServerTrust(serverTrust);
+						// 遍历公钥链 在本地查找合适的公钥，如果有至少一个符合，则验证通过
+            for (id trustChainPublicKey in publicKeys) {
+                for (id pinnedPublicKey in self.pinnedPublicKeys) {
+                    if (AFSecKeyIsEqualToKey((__bridge SecKeyRef)trustChainPublicKey, (__bridge SecKeyRef)pinnedPublicKey)) {
+                        trustedPublicKeyCount += 1;
+                    }
+                }
+            }
+            return trustedPublicKeyCount > 0;
+        }
+            
+        default:
+            return NO;
+    }
+    
+    return NO;
+}
+```
+
+以上就是安全模块中HTTPS的验证处理。
+
+<br />
+
+#### 1.5 数据解析模块
+
+该模块里面包含着请求和响应的协议编码等处理。
+
