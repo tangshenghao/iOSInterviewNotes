@@ -16,7 +16,7 @@ AFNetworking从文件夹上分为了五个模块，如下：
 
 接下来逐个模块解析
 
-
+<br />
 
 #### 1.2 通信模块
 
@@ -88,6 +88,8 @@ AFNetworking从文件夹上分为了五个模块，如下：
 ```
 
 从上述来看，该类主要就是对父类的一层具体方法封装，同时4.x之后在函数上加入headers的字典参数，方便用于在header中需要传递特定信息的请求，例如带access-token等信息。
+
+<br />
 
 ##### 1.2.1 AFURLSessionManager
 
@@ -179,4 +181,64 @@ dataTaskWithRequest的方法返回生成的task，回到AFHTTPSessionManager将�
 ```
 
 触发HTTP请求调用。
+
+<br />
+
+#### 1.3 网络状态监听模块
+
+网络状态监听模块文件里，只有AFNetworkReachabilityManager类，和其他模块没有依赖。
+
+```
+typedef NS_ENUM(NSInteger, AFNetworkReachabilityStatus) {
+    AFNetworkReachabilityStatusUnknown          = -1,
+    AFNetworkReachabilityStatusNotReachable     = 0,
+    AFNetworkReachabilityStatusReachableViaWWAN = 1,
+    AFNetworkReachabilityStatusReachableViaWiFi = 2,
+};
+```
+
+能监听4种状态，未知、不能联通网络、移动数据流量、Wi-Fi。
+
+使用方式很简单，就是通过单例初始化方法创建后，通过设置对应的回调block即可。
+
+其中开始监听的源码如下：
+
+```
+- (void)startMonitoring {
+    [self stopMonitoring];
+
+    if (!self.networkReachability) {
+        return;
+    }
+		// 设置回调block
+    __weak __typeof(self)weakSelf = self;
+    AFNetworkReachabilityStatusCallback callback = ^(AFNetworkReachabilityStatus status) {
+        __strong __typeof(weakSelf)strongSelf = weakSelf;
+
+        strongSelf.networkReachabilityStatus = status;
+        if (strongSelf.networkReachabilityStatusBlock) {
+            strongSelf.networkReachabilityStatusBlock(status);
+        }
+        
+        return strongSelf;
+    };
+		// 使用系统的SCNetworkReachability监听网络
+    SCNetworkReachabilityContext context = {0, (__bridge void *)callback, AFNetworkReachabilityRetainCallback, AFNetworkReachabilityReleaseCallback, NULL};
+    SCNetworkReachabilitySetCallback(self.networkReachability, AFNetworkReachabilityCallback, &context);
+    SCNetworkReachabilityScheduleWithRunLoop(self.networkReachability, CFRunLoopGetMain(), kCFRunLoopCommonModes);
+
+   // 启动时先通知一遍网络状态 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+        SCNetworkReachabilityFlags flags;
+        if (SCNetworkReachabilityGetFlags(self.networkReachability, &flags)) {
+            AFPostReachabilityStatusChange(flags, callback);
+        }
+    });
+}
+```
+
+以上就是网络监听模块的启动实现。
+
+<br />
+
+#### 1.4 网络安全模块
 
