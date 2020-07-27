@@ -242,7 +242,7 @@ typedef NS_ENUM(NSInteger, AFNetworkReachabilityStatus) {
 
 #### 1.4 网络安全模块
 
-该模块只有AFSecurityPolicy一个类，具体实现的功能时完成HTTPS认证，是对系统库<Security/Security.h>的进一步封装。AFNetWorking的默认证书认证流程是客户端单项认证，加入需要双向验证，则服务器和客户端都需要发送数字证书给对方验证，需要用户自行实现。
+该模块只有AFSecurityPolicy一个类，具体实现的功能时完成HTTPS认证，是对系统库<Security/Security.h>的进一步封装。AFNetworking的默认证书认证流程是客户端单项认证，加入需要双向验证，则服务器和客户端都需要发送数字证书给对方验证，需要用户自行实现。
 
 AFSecurityPolicy的三种验证模式
 
