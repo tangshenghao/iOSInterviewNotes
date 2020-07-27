@@ -415,5 +415,279 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
 
 #### 1.5 数据解析模块
 
-该模块里面包含着请求和响应的协议编码等处理。
+该模块里面包含着请求和响应的协议编码等处理。该模块只有两个类，AFURLRequestSerialization和AFURLResponseSerialization，用于处理发送和响应。
+
+##### 1.5.1 AFURLRequestSerialization
+
+AFURLRequestSerialization是个协议，文件里面主要的类是AFHTTPRequestSerializer，同时有两个子类，分别是AFJSONRequestSerializer和AFPropertyListRequestSerializer。这三个类都遵循了AFURLRequestSerialization协议，然后都实现了requestBySerializingRequest方法。
+
+在AFHTTPRequestSerializer中实现如下：
+
+```
+- (NSURLRequest *)requestBySerializingRequest:(NSURLRequest *)request
+                               withParameters:(id)parameters
+                                        error:(NSError *__autoreleasing *)error
+{
+    NSParameterAssert(request);
+
+    NSMutableURLRequest *mutableRequest = [request mutableCopy];
+		// 设置头部
+    [self.HTTPRequestHeaders enumerateKeysAndObjectsUsingBlock:^(id field, id value, BOOL * __unused stop) {
+        if (![request valueForHTTPHeaderField:field]) {
+            [mutableRequest setValue:value forHTTPHeaderField:field];
+        }
+    }];
+		// 参数序列化处理
+    NSString *query = nil;
+    if (parameters) {
+    		// 如果实现了自定义序列化 则执行自定义序列化
+        if (self.queryStringSerialization) {
+            NSError *serializationError;
+            query = self.queryStringSerialization(request, parameters, &serializationError);
+
+            if (serializationError) {
+                if (error) {
+                    *error = serializationError;
+                }
+
+                return nil;
+            }
+        } else {
+        		// 否则则使用AF中带的序列化操作
+            switch (self.queryStringSerializationStyle) {
+                case AFHTTPRequestQueryStringDefaultStyle:
+                    query = AFQueryStringFromParameters(parameters);
+                    break;
+            }
+        }
+    }
+		// GET，HEAD，DELETE拼接在URL之后
+    if ([self.HTTPMethodsEncodingParametersInURI containsObject:[[request HTTPMethod] uppercaseString]]) {
+        if (query && query.length > 0) {
+            mutableRequest.URL = [NSURL URLWithString:[[mutableRequest.URL absoluteString] stringByAppendingFormat:mutableRequest.URL.query ? @"&%@" : @"?%@", query]];
+        }
+    } else {
+    	  // 如果不是，则需要设置Content-Type头部，并把query放到body中
+        // #2864: an empty string is a valid x-www-form-urlencoded payload
+        if (!query) {
+            query = @"";
+        }
+        // AFHTTPRequestSerializer中定义的是application/x-www-form-urlencoded
+        if (![mutableRequest valueForHTTPHeaderField:@"Content-Type"]) {
+            [mutableRequest setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
+        }
+        [mutableRequest setHTTPBody:[query dataUsingEncoding:self.stringEncoding]];
+    }
+
+    return mutableRequest;
+}
+```
+
+在AFJSONRequestSerializer中实现如下：
+
+```
+- (NSURLRequest *)requestBySerializingRequest:(NSURLRequest *)request
+                               withParameters:(id)parameters
+                                        error:(NSError *__autoreleasing *)error
+{
+    NSParameterAssert(request);
+		// 如果是GET、HEAD、DELETE则调用父类的方法
+    if ([self.HTTPMethodsEncodingParametersInURI containsObject:[[request HTTPMethod] uppercaseString]]) {
+        return [super requestBySerializingRequest:request withParameters:parameters error:error];
+    }
+
+    NSMutableURLRequest *mutableRequest = [request mutableCopy];
+		// 设置头参数
+    [self.HTTPRequestHeaders enumerateKeysAndObjectsUsingBlock:^(id field, id value, BOOL * __unused stop) {
+        if (![request valueForHTTPHeaderField:field]) {
+            [mutableRequest setValue:value forHTTPHeaderField:field];
+        }
+    }];
+
+    if (parameters) {
+    		// 如果外部没定义Content-Type 则定义application/json为Content-Type
+        if (![mutableRequest valueForHTTPHeaderField:@"Content-Type"]) {
+            [mutableRequest setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+        }
+				// 如果parameters不是json参数则返回错误信息
+        if (![NSJSONSerialization isValidJSONObject:parameters]) {
+            if (error) {
+                NSDictionary *userInfo = @{NSLocalizedFailureReasonErrorKey: NSLocalizedStringFromTable(@"The `parameters` argument is not valid JSON.", @"AFNetworking", nil)};
+                *error = [[NSError alloc] initWithDomain:AFURLRequestSerializationErrorDomain code:NSURLErrorCannotDecodeContentData userInfo:userInfo];
+            }
+            return nil;
+        }
+				// 序列化json，在request中设置body
+        NSData *jsonData = [NSJSONSerialization dataWithJSONObject:parameters options:self.writingOptions error:error];
+        
+        if (!jsonData) {
+            return nil;
+        }
+        
+        [mutableRequest setHTTPBody:jsonData];
+    }
+
+    return mutableRequest;
+}
+```
+
+在AFPropertyListRequestSerializer中实现如下：
+
+```
+- (NSURLRequest *)requestBySerializingRequest:(NSURLRequest *)request
+                               withParameters:(id)parameters
+                                        error:(NSError *__autoreleasing *)error
+{
+    NSParameterAssert(request);
+		// 如果是HEAD、GET、DELETE则调用父类的方法
+    if ([self.HTTPMethodsEncodingParametersInURI containsObject:[[request HTTPMethod] uppercaseString]]) {
+        return [super requestBySerializingRequest:request withParameters:parameters error:error];
+    }
+
+    NSMutableURLRequest *mutableRequest = [request mutableCopy];
+		// 设置头部信息
+    [self.HTTPRequestHeaders enumerateKeysAndObjectsUsingBlock:^(id field, id value, BOOL * __unused stop) {
+        if (![request valueForHTTPHeaderField:field]) {
+            [mutableRequest setValue:value forHTTPHeaderField:field];
+        }
+    }];
+		
+    if (parameters) {
+    		// 如果没设置Content-Type，则设置成application/x-plist
+        if (![mutableRequest valueForHTTPHeaderField:@"Content-Type"]) {
+            [mutableRequest setValue:@"application/x-plist" forHTTPHeaderField:@"Content-Type"];
+        }
+				// 转成NSDATA并设置到httpbody中
+        NSData *plistData = [NSPropertyListSerialization dataWithPropertyList:parameters format:self.format options:self.writeOptions error:error];
+        
+        if (!plistData) {
+            return nil;
+        }
+        
+        [mutableRequest setHTTPBody:plistData];
+    }
+
+    return mutableRequest;
+}
+```
+
+其中在AFHTTPRequestSerializer初始化时，设置了一些默认的参数
+
+```
+// Accept-Language HTTP Header; see 
+http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.4
+// Accept-Language 系统语言
+    NSMutableArray *acceptLanguagesComponents = [NSMutableArray array];
+    [[NSLocale preferredLanguages] enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        float q = 1.0f - (idx * 0.1f);
+        [acceptLanguagesComponents addObject:[NSString stringWithFormat:@"%@;q=%0.1g", obj, q]];
+        *stop = q <= 0.5f;
+    }];
+    [self setValue:[acceptLanguagesComponents componentsJoinedByString:@", "] forHTTPHeaderField:@"Accept-Language"];
+// userAgent 客户端信息 一般是bundleid/版本信息/屏幕分辨率的倍数等信息
+NSString *userAgent = nil;
+#if TARGET_OS_IOS
+    userAgent = [NSString stringWithFormat:@"%@/%@ (%@; iOS %@; Scale/%0.2f)", [[NSBundle mainBundle] infoDictionary][(__bridge NSString *)kCFBundleExecutableKey] ?: [[NSBundle mainBundle] infoDictionary][(__bridge NSString *)kCFBundleIdentifierKey], [[NSBundle mainBundle] infoDictionary][@"CFBundleShortVersionString"] ?: [[NSBundle mainBundle] infoDictionary][(__bridge NSString *)kCFBundleVersionKey], [[UIDevice currentDevice] model], [[UIDevice currentDevice] systemVersion], [[UIScreen mainScreen] scale]];
+[self setValue:userAgent forHTTPHeaderField:@"User-Agent"];
+// 设置默认的只需拼接到URL的HTTP方法
+self.HTTPMethodsEncodingParametersInURI = [NSSet setWithObjects:@"GET", @"HEAD", @"DELETE", nil];
+```
+
+以上就是AFURLRequestSerialization序列化的一些处理。
+
+<br />
+
+##### 1.5.2 AFURLResponseSerialization
+
+AFURLResponseSerialization也是个协议，是HTTP响应序列化的工具类，与上小节的AFURLRequestSerialization类似，主要是AFHTTPResponseSerializer类，并且该类有6个子类。
+
+每一个AFHTTPResponseSerializer的子类在初始化都设定了acceptableContentTypes这个属性，例如AFJSONResponseSerializer
+
+```
+self.acceptableContentTypes = [NSSet setWithObjects:@"application/json", @"text/json", @"text/javascript", nil];
+```
+
+而AFHTTPResponseSerializer在初始化时会设定acceptableStatusCodes，用于作为请求响应成功的判断200-299的响应码
+
+```
+self.acceptableStatusCodes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(200, 100)];
+```
+
+与上小节一样，不同的子类对应的不同的响应contentType，然后对应不同的contentType来处理响应的数据，例如AFJSONResponseSerializer中
+
+```
+- (id)responseObjectForResponse:(NSURLResponse *)response
+                           data:(NSData *)data
+                          error:(NSError *__autoreleasing *)error
+{
+		// 异常判断
+    if (![self validateResponse:(NSHTTPURLResponse *)response data:data error:error]) {
+        if (!error || AFErrorOrUnderlyingErrorHasCodeInDomain(*error, NSURLErrorCannotDecodeContentData, AFURLResponseSerializationErrorDomain)) {
+            return nil;
+        }
+    }
+
+    // Workaround for behavior of Rails to return a single space for `head :ok` (a workaround for a bug in Safari), which is not interpreted as valid input by NSJSONSerialization.
+    // See https://github.com/rails/rails/issues/1742
+    // 空数据判断
+    BOOL isSpace = [data isEqualToData:[NSData dataWithBytes:" " length:1]];
+    
+    if (data.length == 0 || isSpace) {
+        return nil;
+    }
+    
+    NSError *serializationError = nil;
+    // json序列化处理响应数据，转成json对应的OC对象
+    id responseObject = [NSJSONSerialization JSONObjectWithData:data options:self.readingOptions error:&serializationError];
+
+    if (!responseObject)
+    {
+        if (error) {
+            *error = AFErrorWithUnderlyingError(serializationError, *error);
+        }
+        return nil;
+    }
+    // 是否移除值是NULL的数据
+    if (self.removesKeysWithNullValues) {
+        return AFJSONObjectByRemovingKeysWithNullValues(responseObject, self.readingOptions);
+    }
+		
+    return responseObject;
+}
+```
+
+所有子类对应的响应contentType处理如下：
+
+| Class                            | Accept                                                       | Serializer                  |
+| -------------------------------- | ------------------------------------------------------------ | --------------------------- |
+| AFJSONResponseSerializer         | application/json,text/json,text/javascript                   | NSJSONSerialization         |
+| AFXMLParserResponseSerializer    | application/xml,text/xml                                     | NSXMLParser                 |
+| AFXMLDocumentResponseSerializer  | application/xml,text/xml                                     | NSXMLDocument               |
+| AFPropertyListResponseSerializer | application/x-plist                                          | NSPropertyListSerialization |
+| AFImageResponseSerializer        | image/tiff,image/jpeg,image/gif,image/png,image/ico,image/x-icon,image/bmp,image/x-bmp,image/x-xbitmap,image/x-win-bitmap | NSBitmapImageRep            |
+| AFCompoundResponseSerializer     | 多种类型的集合                                               | -                           |
+
+以上就是数据解析模块的内容。
+
+<br />
+
+#### 1.6 UI层相关模块
+
+该模块包含了
+
+网络下载图像的处理，缓存下载等流程。
+
+UIButton和UIImageView的异步下载并显示等处理。
+
+status bar显示网络状态loading处理。
+
+UIProgressView进度条网络进度显示处理。
+
+UIRefreshControl系统上拉刷新网络处理。
+
+WKWebView网络监听和进度处理。
+
+UIKit就不具体分析源码了。
+
+<br />
 
