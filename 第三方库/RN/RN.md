@@ -38,5 +38,12 @@ iOS原生API有个JavaScriptCore框架，通过它能实现JS和OC交互。
 
 ### 3 React-Native启动流程
 
+1. 创建RCTRootView，该View继承自UIView，也就是用于显示RN的根View。
+2. 创建RCTBridge，用于管理JS和OC的交互，做中转。
+3. 在RCTBridge中创建RCTCxxBridge，该类是RCTBridge的子类。JS和OC的具体交互都在这个类中实现。RCTCxxBridge没有.h文件，是在RCTBridge的分类中定义的。
+4. 接着执行RCTCxxBridge实例的start方法，initializeModules加载所有定义的Module
+5. 接着调用loadSource加载JS源码，内部是RCTJavaScriptLoader调用loadBundleAtURL。
+6. 最后加载完成之后，executeSourceCode执行源代码。
+
 
 
