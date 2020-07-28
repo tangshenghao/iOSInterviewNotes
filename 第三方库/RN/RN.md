@@ -42,8 +42,13 @@ iOS原生API有个JavaScriptCore框架，通过它能实现JS和OC交互。
 2. 创建RCTBridge，用于管理JS和OC的交互，做中转。
 3. 在RCTBridge中创建RCTCxxBridge，该类是RCTBridge的子类。JS和OC的具体交互都在这个类中实现。RCTCxxBridge没有.h文件，是在RCTBridge的分类中定义的。
 4. 接着执行RCTCxxBridge实例的start方法，initializeModules加载所有定义的Module
-5. 接着调用loadSource加载JS源码，内部是RCTJavaScriptLoader调用loadBundleAtURL。
-6. 最后加载完成之后，executeSourceCode执行源代码。
+5. 往JS中插入OC模块表，这块具体代码未能关联起来，还待观察。
+6. 接着调用loadSource加载JS源码，内部是RCTJavaScriptLoader调用loadBundleAtURL。
+7. 最后加载完成之后，executeSourceCode执行源代码。
+8. 执行完后主线程通知回调
+9. 执行UI渲染
 
+<br />
 
+### 4 React-Native加载JS源码
 
