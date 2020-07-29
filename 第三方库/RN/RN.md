@@ -320,7 +320,6 @@ iOS原生API有个JavaScriptCore框架，通过它能实现JS和OC交互。
 4. JS执行OC代码，让UI管理者创建子控件View
 
    ```
-   
    RCT_EXPORT_METHOD(createView:(nonnull NSNumber *)reactTag
                      viewName:(NSString *)viewName
                      rootTag:(nonnull NSNumber *)rootTag
@@ -931,3 +930,26 @@ JS会在加载时去监听supportedEvents中的方法。
 
 <br />
 
+#### 7.4 原生提供UI组件
+
+将原生的组件提供给RN，需要继承RCTViewManager，并且实现view方法。
+
+```
+- (UIView *)view;
+```
+
+内部实现如下：
+
+```
+// 默认是返回RCTView，子类覆盖后，返回的是原生的类
+- (UIView *)view
+{
+#if TARGET_OS_TV
+  return [RCTTVView new];
+#else
+  return [RCTView new];
+#endif
+}
+```
+
+同时内部实现了很多通用的属性实现。
