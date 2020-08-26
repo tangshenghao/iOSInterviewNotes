@@ -143,7 +143,7 @@ pop函数的入参就是push函数的返回值，也就是POOL_SENTINEL的内存
 
 根据官方的NSRunLoop的描述，每一个线程，包括主线程，都会拥有一个专属的NSRunLoop对象，会在需要的时候自动创建。
 
-同样在NSautoreleasePool的描述中，我们知道，在主线程的NSRunLoop对象的每个event loop开始前，系统会自动创建一个autoreleasepool，并在event loop结束时drain。这也就是最开始时说的runloop迭代后会执行对象的release操作。
+同样在NSAutoreleasePool的描述中，我们知道，在主线程的NSRunLoop对象的每个event loop开始前，系统会自动创建一个autoreleasepool，并在event loop结束时drain。这也就是最开始时说的runloop迭代后会执行对象的release操作。
 
 另外，NSAutoreleasePool中还提到，每一个线程都会维护自己的autoreleasepool的堆栈，这也说明autoreleasepool是与线程密切相关的，从page中的属性也可以看出来，thread也就是对应的当前线程。
 
@@ -151,7 +151,7 @@ pop函数的入参就是push函数的返回值，也就是POOL_SENTINEL的内存
 
 #### 1.3 Autorelease返回值的快速释放机制
 
-在内存管理时，有提到，runtime会对autorlease返回值有优化，不会从autoreleasepool中取对象，而是检测到objc_autoreleaseReturnValue和objc_retainAutoreleasedReturnValue配套时，会直接返回对象。
+在内存管理时，有提到，runtime会对autorelease返回值有优化，不会从autoreleasepool中取对象，而是检测到objc_autoreleaseReturnValue和objc_retainAutoreleasedReturnValue配套时，会直接返回对象。
 
 ```
 + (instancetype)createSark {
