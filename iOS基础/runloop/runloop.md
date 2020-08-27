@@ -94,7 +94,7 @@ Mode分为5个，分别是：
 
 - GSEventReceiveRunLoopMode
 
-  -- 接受系统时间的内部Mode，通常用不到
+  -- 接受系统事件的内部Mode，通常用不到
 
 - NSEventTrackingRunLoopMode
 
@@ -128,7 +128,7 @@ CFRunLoopTimerRef是基于时间的触发器，和NSTimer是toll-free bridged，
 
 **CFRunLoopObserverRef**
 
-观察者，每个Observber都包含了一个回调，当RunLoop的状态发生变化时，观察者就能通过回调接受到这个变化，可以观测的时间点有以下几个：
+观察者，每个Observber都包含了一个回调，当RunLoop的状态发生变化时，观察者就能通过回调接收到这个变化，可以观测的事件点有以下几个：
 
 ```
 enum CFRunLoopActivity {
@@ -301,7 +301,7 @@ runloop的挂起是通过CFRunLoopServiceMachPort-call -> mach_msg-call -> mach_
 
 #### 1.5 处理事件
 
-- 如果一个Timer到事件了，触发这个Timer的回调
+- 如果一个Timer到时间了，触发这个Timer的回调
 - 如果有dispatch到main_queue的block，执行block
 - 如果有一个Source1发出事件了，处理这个事件
 
@@ -405,12 +405,12 @@ App启动之后，系统启动主线程并创建了RunLoop，在main thread中�
 
 第一个Observer监听一个事件
 
-1. 即将进入Loop（KCFRunLoopEntry），其回调内会调用 _objc_autoreleasePoolPush()创建自动释放池。其orser是-214783647，优先级最高，保证创建释放池发生在其他所有回调之前。
+1. 即将进入Loop（KCFRunLoopEntry），其回调内会调用 _objc_autoreleasePoolPush()创建自动释放池。其order是-214783647，优先级最高，保证创建释放池发生在其他所有回调之前。
 
 第二个Observer监听两个事件
 
 1. 准备进入休眠，此时调用objc_autoreleasePoolPop()和objc_autoreleasePoolPush()来释放旧的池并创建新的池
-2. 即将退出Loop时调用objc_autoreleasePoolPop()释放自动释放池。这个Observer的ordfer是214783647，确保自动释放池释放在所有回调之后。
+2. 即将退出Loop时调用objc_autoreleasePoolPop()释放自动释放池。这个Observer的order是214783647，确保自动释放池释放在所有回调之后。
 
 
 
@@ -462,7 +462,7 @@ _UIApplicationHandleEventQueue()会把IOHIDEvent处理并包装成UIEvent进行�
 
 当上面的_UIApplicationHandleEventQueue()识别了一个手势时，其首先会调用Cancel将当前的touchesBegin/Move/End系列回调打断。随后系统将对应的UIGestureRecognizer标记为待处理。
 
-苹果注册了一个Observer监测BeforeWaiting事件，即将进入休眠。这个Observer的回调函数时 _UIGestureRecognizerUpdateObserver()，其内部会获取所有刚被标记待处理的GestureRecognizer，并执行回调。
+苹果注册了一个Observer监测BeforeWaiting事件，即将进入休眠。这个Observer的回调函数是 _UIGestureRecognizerUpdateObserver()，其内部会获取所有刚被标记待处理的GestureRecognizer，并执行回调。
 
 当有UIGestureRecognizer的变化时，这个回调都会进行响应处理。
 
