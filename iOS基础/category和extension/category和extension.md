@@ -281,7 +281,7 @@ attachCategoryMethods(class_t *cls, category_list *cats,
 }
 ```
 
-attachCategoryMethods中，把所有category的实例方法列表拼接成了一个大的实例方法列表，然后转角给attachMethodLists方法。
+attachCategoryMethods中，把所有category的实例方法列表拼接成了一个大的实例方法列表，然后转给attachMethodLists方法。
 
 ```
 for (uint32_t m = 0;
@@ -318,9 +318,9 @@ for (uint32_t m = 0;
 
 因为分类中可以实现+load方法，所以+load方法会按照以下顺序执行：
 
-原本类，再到category，而多个category是按照编译的顺序来执行的额。
+原本类。
 
-再到category，而多个category是按照编译的顺序来执行的额。
+再到category，而多个category是按照编译的顺序来执行的。
 
 然后可以在原本类的load方法内调用category的方法，因为加载category的处理在load之前。
 
@@ -356,7 +356,7 @@ category中无法添加成员变量，也不会生成setter和getter方法。但
 @end
 ```
 
-关联对象是由AssociationsManager管理的，AssociationsManager是由一个静态hashMap来存储所有的关联对象，这相当于关联对象都存储在一个全局的map里面。而map的key是这个对象的指针地址，value是另外一个HashMap，里面保存了关联对象的键值对。在对象销毁时，runtime的销毁对象函数objc_destructInstance里面会判断这个对象有没有关联对象，如果有的话没回调用_object_remove_assocations做关联对象的清理工作。
+关联对象是由AssociationsManager管理的，AssociationsManager是由一个静态hashMap来存储所有的关联对象，这相当于关联对象都存储在一个全局的map里面。而map的key是这个对象的指针地址，value是另外一个HashMap，里面保存了关联对象的键值对。在对象销毁时，runtime的销毁对象函数objc_destructInstance里面会判断这个对象有没有关联对象，如果有的话就会调用_object_remove_assocations做关联对象的清理工作。
 
 ```
 void *objc_destructInstance(id obj) 
