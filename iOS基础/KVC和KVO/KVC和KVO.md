@@ -79,7 +79,7 @@ KVC的定义都是对NSObject的拓展来实现的，OC中有个显式的NSKeyVa
 
 3. 如果accessInstanceVariablesDirectly返回NO，则直接抛出NSUnknownKeyException异常。
 
-4. 如果在成员变量列表中找到对应的属性值，则直接赋值，如果四种格式的成员变量都找不到，则抛出NSUnknownKeyException异常。
+4. 如果在成员变量列表中找到对应的属性值，则直接取值，如果四种格式的成员变量都找不到，则抛出NSUnknownKeyException异常。
 
 
 
