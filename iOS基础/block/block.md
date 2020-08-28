@@ -291,7 +291,7 @@ __Block_byref_i_0 *i = __cself->i; // bound by ref
 
 __ block可以用于解决block内部无法修改auto变量值的问题，但不能修饰全局变量和静态变量。
 
-原理是编译器会讲__block修饰的变量包装成一个结构体对象，然后通过结构体的指针找到变量所在的内存，然后进行值的修改
+原理是编译器会将__block修饰的变量包装成一个结构体对象，然后通过结构体的指针找到变量所在的内存，然后进行值的修改
 
 
 
@@ -387,17 +387,17 @@ self.block5 = ^int(int t) {
 
 因为j是在栈上的，在block内部引用j，但是当block从栈上拷贝到堆上时，怎么能保证下次block访问j时，能访问的到。
 
-假设现在有两个栈上的block，分别是block0和block1，同时引用了栈上的__block变量，现在对block0进行copy操作，block会复制到堆上，因为block0持有 _block变量，所以也会把这个变量复制到堆上，同时堆上的block0对堆上的变量是强引用，所以这样能达到block0随时能访问到该变量。
+假设现在有两个栈上的block，分别是block0和block1，同时引用了栈上的__block变量，现在对block0进行copy操作，block0会复制到堆上，因为block0持有block变量，所以也会把这个变量复制到堆上，同时堆上的block0对堆上的变量是强引用，所以这样能达到block0随时能访问到该变量。
 
-此时如果block也拷贝到堆上，因为刚才block中的变量已经拷贝到堆上了，就不需要再次拷贝，只需要把堆上的block1也强引用堆上的变量就可以了。
+此时如果block1也拷贝到堆上，因为刚才block0中的变量已经拷贝到堆上了，就不需要再次拷贝，只需要把堆上的block1也强引用堆上的变量就可以了。
 
 然后释放的时候
 
 会调用block内部的dispose函数
 
-dispose函数内部会调用_block_object_dispose函数，该函数会自动释放引用的__block变量(release)
+dispose函数内部会调用_block_object_dispose函数，该函数会自动释放引用的block变量(release)
 
-上述block0和block1都引用block变量，当block销毁时候，直接销毁堆上的block变量，但需要两个都废弃时，才会废弃__blcok变量。
+上述block0和block1都引用block变量，当block销毁时候，直接销毁堆上的block变量，但需要两个都废弃时，才会废弃block变量。
 
 其实就和引用计数一样，都没有引用时才废弃。
 
@@ -452,7 +452,7 @@ test.testBlock = ^{
 __weak typeof(test) weakTest = test;
 ```
 
-也可以用使用__unsafe_unretained来解决循环引用，但是一般不使用，因为对象相会时不会将指针执行nil，会造成野指针的情况。
+也可以用使用__unsafe_unretained来解决循环引用，但是一般不使用，因为对象销毁时不会将指针指向nil，会造成野指针的情况。
 
 使用__block也可以解决，但是需要在最后将对象置nil。也必须调用一遍该block。最好还是使用weak修饰的方式来解决，并且还需要在block内部使用strong再次进行修饰，不然会在部分延时或者异步的操作中找不到对应的值。
 
