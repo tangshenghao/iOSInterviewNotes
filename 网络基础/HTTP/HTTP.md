@@ -2,9 +2,7 @@
 
 ### 1 Web的显示
 
-根据Web浏览器地址栏指定URL，Web 浏览器从Web服务器端获取文件资源
-
-等信息，从而显示出Web页面。
+根据Web浏览器地址栏指定URL，Web 浏览器从Web服务器端获取文件资源等信息，从而显示出Web页面。
 
 Web的通信方式是建立在HTTP协议上进行的。
 
@@ -160,7 +158,7 @@ GET把请求发送过去，服务器响应200返回数据。POST是先发送Head
 
 **307 Temporary Redirect**：临时重定向，与302类似，307不会从POST变成GET。
 
-**400 Bad Request**：表示请求报文中存在语法错误。
+**400 Bad Request**：表示请求报文中存在语法错误。
 
 **401 Unauthorized**：表示发送的请求需要有通过HTTP认证信息。
 
