@@ -242,14 +242,14 @@ typedef NS_ENUM(NSInteger, AFNetworkReachabilityStatus) {
 
 #### 1.4 网络安全模块
 
-该模块只有AFSecurityPolicy一个类，具体实现的功能时完成HTTPS认证，是对系统库<Security/Security.h>的进一步封装。AFNetworking的默认证书认证流程是客户端单项认证，加入需要双向验证，则服务器和客户端都需要发送数字证书给对方验证，需要用户自行实现。
+该模块只有AFSecurityPolicy一个类，具体实现的功能是完成HTTPS认证，是对系统库<Security/Security.h>的进一步封装。AFNetworking的默认证书认证流程是客户端单项认证，加入需要双向验证，则服务器和客户端都需要发送数字证书给对方验证，需要用户自行实现。
 
 AFSecurityPolicy的三种验证模式
 
 ```
 typedef NS_ENUM(NSUInteger, AFSSLPinningMode) {
     AFSSLPinningModeNone,  			  // 无条件信任服务器的证书
-    AFSSLPinningModePublicKey,	  // 会对服务器返回的证书种的PublicKey进行验证
+    AFSSLPinningModePublicKey,	  // 会对服务器返回的证书中的PublicKey进行验证
     AFSSLPinningModeCertificate,	// 会对服务器返回的证书同本地证书全部进行验证
 };
 ```
@@ -375,7 +375,7 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
 
             // obtain the chain after being validated, which *should* contain the pinned certificate in the last position (if it's the Root CA)
             NSArray *serverCertificates = AFCertificateTrustChainForServerTrust(serverTrust);
-            // 连理证书链
+            // 证书链
             for (NSData *trustChainCertificate in [serverCertificates reverseObjectEnumerator]) {
             // 如果包含本地证书，说明是有效的
                 if ([self.pinnedCertificates containsObject:trustChainCertificate]) {
