@@ -892,13 +892,13 @@ SDDiskCache是用于对磁盘缓存文件进行处理的类，也是定义了SDD
 
 ##### 1.3.2 弱引用的MapTable
 
-在框架内使用了弱引用的map来给对象去除弱引用，并且可以在元素为nil时自动移除该元素，非常方便。
+在框架内使用了弱引用的map，可以不强引用map内的对象，并且可以在元素为nil时自动移除该元素，非常方便。
 
 ```
 self.weakCache = [[NSMapTable alloc] initWithKeyOptions:NSPointerFunctionsStrongMemory valueOptions:NSPointerFunctionsWeakMemory capacity:0];
 ```
 
-同时在操作时也要保证线程安全，所以读写操作都进行了加锁操作。项目中使用的信号量进行加锁。
+同时在操作时也要保证线程安全，所有读写操作都进行了加锁操作。项目中使用的信号量进行加锁。
 
 ```
 ...
