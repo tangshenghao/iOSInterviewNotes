@@ -28,19 +28,22 @@
 //    imageView.layer.borderColor = [UIColor blackColor].CGColor;
     [self.view addSubview:imageView];
     
-    //加上子视图会产生离屏渲染
+    //加上子视图会产生离屏渲染 如果子视图有图像、边框、背景其中之一的情况都会产生离屏渲染
     UIImageView *imageView2 = [[UIImageView alloc] initWithFrame:CGRectMake(20, 20, 50, 50)];
-//    imageView2.image = [UIImage imageNamed:@"test"];
-    imageView2.backgroundColor = [UIColor blackColor];
-    imageView2.layer.cornerRadius = 30.f;
-    imageView2.layer.masksToBounds = YES;
-    [imageView addSubview:imageView2];
+    imageView2.image = [UIImage imageNamed:@"test"];
+//    imageView2.backgroundColor = [UIColor blackColor];
+//    imageView2.layer.cornerRadius = 30.f;
+//    imageView2.layer.masksToBounds = YES;
+//    [imageView addSubview:imageView2];
     
     
     // 给View的content设置图像内容会造成离屏渲染
     UIView *view = [[UIView alloc] initWithFrame:CGRectMake(100, 250, 100, 100)];
-    view.backgroundColor = [UIColor redColor];
+//    view.backgroundColor = [UIColor redColor];
     view.layer.cornerRadius = 30.f;
+//    view.layer.opacity = 0.3;
+//    view.layer.borderColor = [UIColor blackColor].CGColor;
+//    view.layer.borderWidth = 2.f;
     view.layer.contents = (__bridge id _Nullable)([UIImage imageNamed:@"test"].CGImage);
     view.clipsToBounds = YES;
     [self.view addSubview:view];
