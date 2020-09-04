@@ -1,6 +1,6 @@
 ## Autoreleasepool实现
 
-通过前部分的了解，内存管理中，对象延迟释放，可以对对象执行autorelease操作，其实也就是将其加入到autoreleasepool中，直到超出Autorelease的作用范围或者runloop的一次迭代结束时进行释放。在ARC中，编译器已自动添加了autorelease的代码，大部分情况下是不需要手动去autoreleasepool的操作，比如在较大循环内部有autorelease的对象时，可以使用@autoreleasepool{}来规定对象在指定作用域后释放，以此优化内存。
+通过前部分的了解，内存管理中，对象延迟释放，可以对对象执行autorelease操作，其实也就是将其加入到AutoreleasePool中，直到超出AutoreleasePool的作用范围或者runloop的一次迭代结束时进行释放。在ARC中，编译器已自动添加了autorelease的代码，大部分情况下是不需要手动去AutoreleasePool的操作，但比如在较大循环内部有autorelease的对象时，可以使用@autoreleasepool{}来规定对象在指定作用域后释放，以此优化内存。
 
 ### 1 Autoreleasepool实现原理
 
@@ -20,10 +20,10 @@ objc_autoreleasePoolPop(context);
 
 **AutoreleasePoolPage**
 
-Autoreleasepool是没有单独的内存结构的，是通过Autoreleasepool为节点的双向链表来实现的（parent指针和child指针）。
+AutoreleasePool是没有单独的内存结构的，是通过AutoreleasePoolPage为节点的双向链表来实现的（parent指针和child指针）。
 
-- 每一个线程的autoreleasepool其实就是一个指针的堆栈，与线程是一一对应的。
-- 每一个指针代表一个需要release的对象或者POOL_SENTINEL(哨兵对象，代表一个autoreleasepool的边界)
+- 每一个线程的AutoreleasePool其实就是一个指针的堆栈，与线程是一一对应的。
+- 每一个指针代表一个需要release的对象或者POOL_SENTINEL(哨兵对象，代表一个AutoreleasePool的边界)
 - AutoreleasePoolPage每个对象会开辟4096字节内存，也就是虚拟内存一页的大小，除了变量所占用的空间，其余的空间都会用来储存执行了autorelease的对象的地址。
 - 一个pool token就是这个pool所对应的POOL_SENTINEL的内存地址，当这个pool被pop的时候，所有内存地址在pool token之后的对象都要会执行release。
 - 这个堆栈被划分成了一个以page为节点的双向链表。pages会在必要的时候新增或者减少。
@@ -145,13 +145,13 @@ pop函数的入参就是push函数的返回值，也就是POOL_SENTINEL的内存
 
 同样在NSAutoreleasePool的描述中，我们知道，在主线程的NSRunLoop对象的每个event loop开始前，系统会自动创建一个autoreleasepool，并在event loop结束时drain。这也就是最开始时说的runloop迭代后会执行对象的release操作。
 
-另外，NSAutoreleasePool中还提到，每一个线程都会维护自己的autoreleasepool的堆栈，这也说明autoreleasepool是与线程密切相关的，从page中的属性也可以看出来，thread也就是对应的当前线程。
+另外，NSAutoreleasePool中还提到，每一个线程都会维护自己的AutoreleasePool的堆栈，这也说明AutoreleasePool是与线程密切相关的，从page中的属性也可以看出来，thread也就是对应的当前线程。
 
 
 
 #### 1.3 Autorelease返回值的快速释放机制
 
-在内存管理时，有提到，runtime会对autorelease返回值有优化，不会从autoreleasepool中取对象，而是检测到objc_autoreleaseReturnValue和objc_retainAutoreleasedReturnValue配套时，会直接返回对象。
+在内存管理时，有提到，runtime会对autorelease返回值有优化，不会从AutoreleasePool中取对象，而是检测到objc_autoreleaseReturnValue和objc_retainAutoreleasedReturnValue配套时，会直接返回对象。
 
 ```
 + (instancetype)createSark {
@@ -198,7 +198,7 @@ id obj = [NSObject alloc] init];
 
 #### 1.5 总结
 
-通常的ARC情况下，我们是不需要手动添加autoreleasepool的，使用的是线程自动维护的autoreleasepool就好，在以下三种情况需要添加autoreleasepool：
+通常的ARC情况下，我们是不需要手动添加AutoreleasePool的，使用的是线程自动维护的AutoreleasePool就好，在以下三种情况需要添加AutoreleasePool：
 
 1. 如果你编写的程序不是UI框架的，而是命令行工具。
 2. 如果你编写的循环中创建了大量的临时对象。
