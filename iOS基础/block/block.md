@@ -387,6 +387,8 @@ self.block5 = ^int(int t) {
 
 因为j是在栈上的，在block内部引用j，但是当block从栈上拷贝到堆上时，怎么能保证下次block访问j时，能访问的到。
 
+block会将该变量也copy到堆上。
+
 假设现在有两个栈上的block，分别是block0和block1，同时引用了栈上的__block变量，现在对block0进行copy操作，block0会复制到堆上，因为block0持有block变量，所以也会把这个变量复制到堆上，同时堆上的block0对堆上的变量是强引用，所以这样能达到block0随时能访问到该变量。
 
 此时如果block1也拷贝到堆上，因为刚才block0中的变量已经拷贝到堆上了，就不需要再次拷贝，只需要把堆上的block1也强引用堆上的变量就可以了。
