@@ -110,15 +110,15 @@ iOS中公开暴露出来的只有NSDefaultRunLoopMode和NSRunLoopCommonModes。N
 
 **CFRunLoopSource**
 
-RunLoopSource分为Source、Observer、Timer三种。
-
 CFRunLoopSource是对input sources的抽象类，Source有两个版本：Source0和Source1。
 
 - source0：只包含了一个回调，使用时，你需要先调用CFRunLoopSourceSignal(source)，将这个Source标记为待处理，然后手动调用CFRunLoopWakeUp(runloop)来唤醒RunLoop，让其处理这个事件。处理App内部事件，App自己负责管理，如UIEvent、CFSocketRef。
 
 - source1： 由RunLoop和内核管理，由mach_port驱动，如CFMachPort、CFMessagePort、NSSocketPort。特别要注意一下machport的概念，它是一个轻量级的进程间通讯的方式，可以理解为它是一个通讯通道，假如同时有几个进程都挂在这个通道上，那么其他进程向这个通道发送消息后，这些挂在这个通道上的进程都可以收到相应的消息。它是RunLoop休眠和被唤醒的关键，是RunLoop和系统内核进行消息通讯的窗口。
 
+Source1基本就是系统事件，Source0基本就是应用层事件。
 
+Source1是由其他进程或者系统内核通过port发送的事件，比如触摸屏幕，屏幕事件会包装成Event，先告诉source1，source1唤醒RunLoop，然后将事件Event分发给Source0，然后由Source0来处理。如果没有事件，也没有Timer，则RunLoop就会休眠，如果有，则RunLoop会被唤醒，然后跑一圈。
 
 **CFRunLoopTimerRef**
 
