@@ -7,6 +7,7 @@
 //
 
 #import "ViewController.h"
+#import "TSSpinLock.h"
 
 @interface ViewController () {
     int count;
@@ -14,7 +15,7 @@
 
 @property (atomic, strong) NSArray *array;
 
-@property (nonatomic, strong) NSLock *lock;
+@property (nonatomic, strong) TSSpinLock *lock;
 
 @end
 
@@ -49,8 +50,42 @@
 //            NSLog(@"=%d", j);
 //        }
 //    });
-    count = 20;
-    [self testSynchronized];
+//    count = 20;
+//    [self testSynchronized];
+    
+    self.lock = [[TSSpinLock alloc] init];
+    
+    count = 100;
+    
+    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+        [self test];
+    });
+    
+    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+        [self test];
+    });
+    
+    
+}
+
+- (void)test {
+    while (1) {
+        
+        [self.lock lock];
+        NSLog(@"====加锁");
+        if (count > 0) {
+            count--;
+            [NSThread sleepForTimeInterval:0.5];
+            NSLog(@"====剩余票数为：%d  thread:%@", count, [NSThread currentThread]);
+        }
+        NSLog(@"====解锁");
+        [self.lock unlock];
+        
+        if (count <= 0) {
+            NSLog(@"票卖完了");
+            break;
+        }
+    }
 }
 
 - (void)testSynchronized {

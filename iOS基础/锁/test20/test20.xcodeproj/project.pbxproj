@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5E66C8E125062AD9001680BD /* TSSpinLock.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E66C8E025062AD9001680BD /* TSSpinLock.m */; };
 		5EAFAD9524BCB10D0092842A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 5EAFAD9424BCB10D0092842A /* AppDelegate.m */; };
 		5EAFAD9824BCB10D0092842A /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 5EAFAD9724BCB10D0092842A /* SceneDelegate.m */; };
 		5EAFAD9B24BCB10D0092842A /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5EAFAD9A24BCB10D0092842A /* ViewController.m */; };
@@ -17,6 +18,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		5E66C8DF25062AD9001680BD /* TSSpinLock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TSSpinLock.h; sourceTree = "<group>"; };
+		5E66C8E025062AD9001680BD /* TSSpinLock.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TSSpinLock.m; sourceTree = "<group>"; };
 		5EAFAD9024BCB10D0092842A /* test20.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = test20.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5EAFAD9324BCB10D0092842A /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		5EAFAD9424BCB10D0092842A /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -67,6 +70,8 @@
 				5EAFAD9724BCB10D0092842A /* SceneDelegate.m */,
 				5EAFAD9924BCB10D0092842A /* ViewController.h */,
 				5EAFAD9A24BCB10D0092842A /* ViewController.m */,
+				5E66C8DF25062AD9001680BD /* TSSpinLock.h */,
+				5E66C8E025062AD9001680BD /* TSSpinLock.m */,
 				5EAFAD9C24BCB10D0092842A /* Main.storyboard */,
 				5EAFAD9F24BCB10F0092842A /* Assets.xcassets */,
 				5EAFADA124BCB10F0092842A /* LaunchScreen.storyboard */,
@@ -146,6 +151,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5E66C8E125062AD9001680BD /* TSSpinLock.m in Sources */,
 				5EAFAD9B24BCB10D0092842A /* ViewController.m in Sources */,
 				5EAFAD9524BCB10D0092842A /* AppDelegate.m in Sources */,
 				5EAFADA624BCB1100092842A /* main.m in Sources */,
