@@ -28,7 +28,7 @@ UIKit层是通过给定UIImageView、UIButton的分类来实现具体显示图�
 
 先通过常用的UIImageView和UIButton的分类来分析UIKit层的代码实现。
 
-**UIImageView+Cache.h**
+**UIImageView+WebCache.h**
 
 该类提供了设置图片URL、placeholder、数据下载进度回调以及显示完成回调等接口。
 
@@ -84,7 +84,7 @@ UIKit层是通过给定UIImageView、UIButton的分类来实现具体显示图�
 
 <br />
 
-**UIImageView+Cache.m**
+**UIImageView+WebCache.m**
 
 通过实现文件看，实际上所有的接口最终都是指向sd_setImageWithURL:placeholderImage:options:context:方法。方法里面的实现是调用了sd_internalSetImageWithURL:的方法，该方法是在UIView+WebCache中实现的。
 
