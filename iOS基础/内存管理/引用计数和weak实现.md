@@ -93,7 +93,7 @@ typedef __darwin_size_t        size_t;
 
 定义的其实是unsigned long，
 
-对于这个类型，从地位到高位：
+对于这个类型，从低位到高位：
 
 **(1UL<<0)    WEAKLY_REFERENCED**
 
