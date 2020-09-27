@@ -14,7 +14,7 @@
 
 首先苹果创建了一个全局的SideTables，用来管理所有对象的引用计数，是一个全局的Hash表，从名称的结尾带s上看更像是个数组，也有部分文章称其为Hash数组，可以通过对象经过算法映射到对应的元素中。
 
-SideTables的元素数量，通过源码得出是64个。如下代码：
+SideTables的元素数量，通过源码得出是8或者64个。如下代码：
 
 ```
 // SideTables 实质类型为模版类型StripedMap
@@ -29,13 +29,10 @@ static StripedMap<SideTable>& SideTables() {
 // or as StripedMap<SomeStruct> where SomeStruct stores a spin lock.
 template<typename T>
 class StripedMap {
-
-    enum { CacheLineSize = 64 };
-
-#if TARGET_OS_EMBEDDED
-    enum { StripeCount = 8 };
+#if TARGET_OS_IPHONE && !TARGET_OS_SIMULATOR
+    enum { StripeCount = 8 }; // 我看的这版手机端是8
 #else
-    enum { StripeCount = 64 };  // iOS 设备的StripeCount = 64
+    enum { StripeCount = 64 };
 #endif
 
     struct PaddedT {
@@ -43,7 +40,7 @@ class StripedMap {
         
     };
 
-    PaddedT array[StripeCount]; // 所有PaddedT struct 类型数据被存储在array数组中。iOS 设备 StripeCount == 64
+    PaddedT array[StripeCount]; // 所有PaddedT struct 类型数据被存储在array数组中。iOS 设备 StripeCount == 8
 
     static unsigned int indexForPointer(const void *p) { // 该方法以void *作为key 来获取void *对应在StripedMap 中的位置
         uintptr_t addr = reinterpret_cast<uintptr_t>(p);
@@ -61,9 +58,9 @@ class StripedMap {
 return ((addr >> 4) ^ (addr >> 9)) % StripeCount;
 ```
 
-其中StripeCount是64，所以必定是在64个元素中找到对应的SideTable。
+其中StripeCount是8，所以必定是在8个元素中找到对应的SideTable。
 
-因为只有64个，所以必定存在Hash冲突，但苹果就是特意将不同的对象映射到同样的SideTable中，采用了分离锁技术，分别在元素处理时只锁定当前元素而不影响其他63个元素的处理。至于怎么找到对应的引用计数和Weak表，接下来一步一步分析。
+因为只有8个，所以必定存在Hash冲突，但苹果就是特意将不同的对象映射到同样的SideTable中，采用了分离锁技术，分别在元素处理时只锁定当前元素而不影响其他7个元素的处理。至于怎么找到对应的引用计数和Weak表，接下来一步一步分析。
 
 
 
@@ -198,7 +195,7 @@ table.unlock();
 
 dealloc操作做了大量的逻辑判断和处理。
 
-下面是sidetable_clearDeallocation()
+下面是objc_object::sidetable_clearDeallocating()
 
 ```
 SideTable& table = SideTables()[this];
