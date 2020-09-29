@@ -290,7 +290,7 @@ runloop的挂起是通过CFRunLoopServiceMachPort-call -> mach_msg-call -> mach_
 
 以下几种情况下会被唤醒
 
-- 存在Source0被标记为待处理，系统调用CFRunLoopWakeUp唤醒线程处理
+- 接收到Source1
 - 定时器时间到了
 - RunLoop自身的超时时间到了
 - RunLoop外部调用者唤醒
