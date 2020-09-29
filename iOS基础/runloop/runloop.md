@@ -82,7 +82,7 @@ RunLoop的结构关系如图：
 
 一个RunLoop包含了多个Mode，每个Mode又包含了若干个Source/Timer/Observer。每次调用RunLoop的主函数时，只能指定其中一个Mode，这个Mode被称作CurrentMode。如果需要切换Mode，只能退出Loop再重新指定一个Mode进入。这样做主要是为了分隔开不同Mode中的Source/Timer/Observer，让其互不影响。
 
-一个CFRunLoopMode对象有一个name，若干个source0、source1、timer、observer和若干port，可见事件都是由Mode再管理，而RunLoop管理Mode。
+一个CFRunLoopMode对象有一个name，若干个source0、source1、timer、observer和若干port，可见事件都是由Mode在管理，而RunLoop管理Mode。
 
 Mode分为5个，分别是：
 
