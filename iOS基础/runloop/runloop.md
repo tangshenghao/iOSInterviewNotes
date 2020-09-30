@@ -155,7 +155,7 @@ timer和source1，可以反复使用，比如timer设置成repeat，port可以�
 
 运行机制如下图：
 
-![](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/iOS%E5%9F%BA%E7%A1%80/runloop/runloop%E8%BF%90%E8%A1%8C%E6%9C%BA%E5%88%B6.png?raw=true)
+![](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/iOS%E5%9F%BA%E7%A1%80/runloop/runloop%E8%BF%90%E8%A1%8C%E6%9C%BA%E5%88%B6.jpg?raw=true)
 
 
 
