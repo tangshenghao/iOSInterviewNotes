@@ -35,7 +35,7 @@ struct __CFRunLoop {
 };
 ```
 
-其中，主要是的对应的线程，若干个Mode，若干个commonMode，还有一个当前运行的Mode。
+其中，主要是对应的线程，若干个Mode，若干个commonMode，还有一个当前运行的Mode。
 
 > CFRunLoop对象可以检测某个task或者dispatch的输入事件，当检测到有输入源事件，CFRunLoop将会将其加入到线程中进行处理。比方说用户输入事件、网络连接事件、周期性或者延时事件、异步的回调等。
 >
