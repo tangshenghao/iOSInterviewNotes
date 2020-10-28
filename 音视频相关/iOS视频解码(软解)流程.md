@@ -61,7 +61,7 @@ brew install yasm
 
 编译后即可得到对应的静态库和头文件
 
-![](图片1)
+![](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/%E9%9F%B3%E8%A7%86%E9%A2%91%E7%9B%B8%E5%85%B3/iOS%E8%A7%86%E9%A2%91%E8%A7%A3%E7%A0%81(%E8%BD%AF%E8%A7%A3)%E6%B5%81%E7%A8%8B1.png?raw=true)
 
 #### 1.3 项目中使用FFmpeg
 
@@ -75,7 +75,7 @@ libiconv.tbd
 
 在Header Search Path中添加到include文件夹的相对路径
 
-![](图片2)
+![](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/%E9%9F%B3%E8%A7%86%E9%A2%91%E7%9B%B8%E5%85%B3/iOS%E8%A7%86%E9%A2%91%E8%A7%A3%E7%A0%81(%E8%BD%AF%E8%A7%A3)%E6%B5%81%E7%A8%8B2.png?raw=true)
 
 然后在代码中通过以下方式引入
 
@@ -101,7 +101,7 @@ extern "C" {
 
 ### 2 软解流程图
 
-![](图片3)
+![](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/%E9%9F%B3%E8%A7%86%E9%A2%91%E7%9B%B8%E5%85%B3/iOS%E8%A7%86%E9%A2%91%E8%A7%A3%E7%A0%81(%E8%BD%AF%E8%A7%A3)%E6%B5%81%E7%A8%8B3.jpg?raw=true)
 
 ### 3 软解数据结构
 
