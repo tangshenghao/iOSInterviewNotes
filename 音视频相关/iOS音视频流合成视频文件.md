@@ -1,4 +1,4 @@
-## iOS视频渲染显示的三种方式
+## iOS音视频流合成视频文件
 
 ### 1 简要说明
 
@@ -16,7 +16,7 @@
 
 ### 2 合成视频文件流程图
 
-![](图片1)
+![](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/%E9%9F%B3%E8%A7%86%E9%A2%91%E7%9B%B8%E5%85%B3/iOS%E9%9F%B3%E8%A7%86%E9%A2%91%E6%B5%81%E5%90%88%E6%88%90%E8%A7%86%E9%A2%91%E6%96%87%E4%BB%B61.jpg?raw=true)
 
 ### 3 参数和接口说明
 

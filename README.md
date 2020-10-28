@@ -70,4 +70,5 @@ iOS面试的准备、知识点的积累
 * [iOS视频解码(软解)流程](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/%E9%9F%B3%E8%A7%86%E9%A2%91%E7%9B%B8%E5%85%B3/iOS%E8%A7%86%E9%A2%91%E8%A7%A3%E7%A0%81(%E8%BD%AF%E8%A7%A3)%E6%B5%81%E7%A8%8B.md)
 * [iOS视频渲染显示的三种方式](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/%E9%9F%B3%E8%A7%86%E9%A2%91%E7%9B%B8%E5%85%B3/iOS%E8%A7%86%E9%A2%91%E6%B8%B2%E6%9F%93%E6%98%BE%E7%A4%BA%E7%9A%84%E4%B8%89%E7%A7%8D%E6%96%B9%E5%BC%8F.md)
 * [iOS音频解码(c和FFMpeg)](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/%E9%9F%B3%E8%A7%86%E9%A2%91%E7%9B%B8%E5%85%B3/iOS%E9%9F%B3%E9%A2%91%E8%A7%A3%E7%A0%81(c%E5%92%8CFFMpeg).md)
+* [iOS音视频流合成视频文件](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/%E9%9F%B3%E8%A7%86%E9%A2%91%E7%9B%B8%E5%85%B3/iOS%E9%9F%B3%E8%A7%86%E9%A2%91%E6%B5%81%E5%90%88%E6%88%90%E8%A7%86%E9%A2%91%E6%96%87%E4%BB%B6.md)
 
