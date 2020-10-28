@@ -63,3 +63,6 @@ iOS面试的准备、知识点的积累
 * [大图显示](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/iOS%E8%BF%9B%E9%98%B6/%E5%A4%A7%E5%9B%BE%E6%98%BE%E7%A4%BA/%E5%A4%A7%E5%9B%BE%E6%98%BE%E7%A4%BA.md)
 * [启动优化](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/iOS%E8%BF%9B%E9%98%B6/%E5%90%AF%E5%8A%A8%E4%BC%98%E5%8C%96/%E5%90%AF%E5%8A%A8%E4%BC%98%E5%8C%96.md)
 
+## 音视频相关
+
+* [视频H264编解码基础知识](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/%E9%9F%B3%E8%A7%86%E9%A2%91%E7%9B%B8%E5%85%B3/%E8%A7%86%E9%A2%91H264%E7%BC%96%E8%A7%A3%E7%A0%81%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86.md)
