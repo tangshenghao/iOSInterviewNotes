@@ -10,7 +10,7 @@
 
 ### 2 硬解流程图
 
-![](图片1)
+![](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/%E9%9F%B3%E8%A7%86%E9%A2%91%E7%9B%B8%E5%85%B3/iOS%E8%A7%86%E9%A2%91%E8%A7%A3%E7%A0%81(%E7%A1%AC%E8%A7%A3)%E6%B5%81%E7%A8%8B1.jpg?raw=true)
 
 ### 3 硬解数据结构
 
@@ -20,7 +20,7 @@
 
 如下图所示：
 
-![](图片2)
+![](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/%E9%9F%B3%E8%A7%86%E9%A2%91%E7%9B%B8%E5%85%B3/iOS%E8%A7%86%E9%A2%91%E8%A7%A3%E7%A0%81(%E7%A1%AC%E8%A7%A3)%E6%B5%81%E7%A8%8B2.png?raw=true)
 
 CMSampleBuffer即可以作为未解码前的数据的容器，可以用压缩的数据CMBlockBuffer来生成。也可以作为解码后的数据的容器，可以解出CVPixelBuffer或者根据CVPixelBuffe生成。
 
@@ -258,7 +258,7 @@ if (noErr != status) {
 
 过程如下图：
 
-![](图片3)
+![](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/%E9%9F%B3%E8%A7%86%E9%A2%91%E7%9B%B8%E5%85%B3/iOS%E8%A7%86%E9%A2%91%E8%A7%A3%E7%A0%81(%E7%A1%AC%E8%A7%A3)%E6%B5%81%E7%A8%8B3.png?raw=true)
 
 其中CMTime在这个项目中可以不加入，也能生成正常使用的CMSampleBuffer。
 
