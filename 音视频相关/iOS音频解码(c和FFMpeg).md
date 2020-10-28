@@ -43,7 +43,7 @@ G.711 (PCM方式)
 
 a-law的公式如下，A = 87.6
 
-![](图片1)
+![](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/%E9%9F%B3%E8%A7%86%E9%A2%91%E7%9B%B8%E5%85%B3/iOS%E9%9F%B3%E9%A2%91%E8%A7%A3%E7%A0%81(c%E5%92%8CFFMpeg)1.png?raw=true)
 
 G.711A
 
@@ -61,7 +61,7 @@ a-law如下表计算。
 - 对于3到8行，斜率分别是1/4到1/128，共6段折线。
 - 总共13段折线，这就是所谓的A-law十三段折线法。
 
-![](图片2)
+![](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/%E9%9F%B3%E8%A7%86%E9%A2%91%E7%9B%B8%E5%85%B3/iOS%E9%9F%B3%E9%A2%91%E8%A7%A3%E7%A0%81(c%E5%92%8CFFMpeg)2.png?raw=true)
 
 **示例：**
 
@@ -165,13 +165,13 @@ u-law输入的是14位，编码算法就是查表，计算出：基础值+平均
 
 u-law的公式如下，μ取值一般为255
 
-![](图片3)
+![](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/%E9%9F%B3%E8%A7%86%E9%A2%91%E7%9B%B8%E5%85%B3/iOS%E9%9F%B3%E9%A2%91%E8%A7%A3%E7%A0%81(c%E5%92%8CFFMpeg)3.png?raw=true)
 
 计算方法如下表
 
-![](图片4)
+![](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/%E9%9F%B3%E8%A7%86%E9%A2%91%E7%9B%B8%E5%85%B3/iOS%E9%9F%B3%E9%A2%91%E8%A7%A3%E7%A0%81(c%E5%92%8CFFMpeg)4.png?raw=true)
 
-![](图片5)
+![](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/%E9%9F%B3%E8%A7%86%E9%A2%91%E7%9B%B8%E5%85%B3/iOS%E9%9F%B3%E9%A2%91%E8%A7%A3%E7%A0%81(c%E5%92%8CFFMpeg)5.png?raw=true)
 
 输入pcm数据为1234
 
@@ -244,7 +244,7 @@ int ulaw2linear( int    u_val)
 
 a-law和u-law画在同一个坐标轴中就能发现A-law在低强度信号下，精度要稍微高一些。
 
-![](图片6)
+![](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/%E9%9F%B3%E8%A7%86%E9%A2%91%E7%9B%B8%E5%85%B3/iOS%E9%9F%B3%E9%A2%91%E8%A7%A3%E7%A0%81(c%E5%92%8CFFMpeg)6.png?raw=true)
 
 实际应用中，我们确实可以用浮点数计算的方式把F(x)结果计算出来，然后进行量化，但是这样一来计算量会比较大，实际上对于A-law（A=87.6时），是采用13折线近似的方式来计算的，而u-law（μ=255时）则是15段折线近似的方式。
 
