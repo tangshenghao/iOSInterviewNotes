@@ -266,7 +266,7 @@ typedef NS_ENUM(NSUInteger, AFSSLPinningMode) {
 // 允许使用无效或过期的证书，默认是NO不允许
 @property (nonatomic, assign) BOOL allowInvalidCertificates;
 
-// 是否校验证书种的域名，默认是YES
+// 是否校验证书中的域名，默认是YES
 @property (nonatomic, assign) BOOL validatesDomainName;
 ```
 
