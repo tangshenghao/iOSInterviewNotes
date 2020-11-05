@@ -425,7 +425,7 @@ NSLog((NSString *)&__NSConstantStringImpl__var_folders_hz_6yv0h07n6mz76tv81_0rmg
 
 为什么不直接使用test1，而是需要通过__forwarding去调用呢？
 
-因为，如果__变量还在栈上，是可以直接访问，但是如果已经拷贝到堆堆上，访问时，还去访问栈上的，就会出问题，所以先根据forwarding找到堆上的地址，然后再去取值，如下图：
+因为，如果__block修饰的变量还在栈上，是可以直接访问，但是如果已经拷贝到堆上，访问时，还去访问栈上的，就会出问题，所以先根据forwarding找到堆上的地址，然后再去取值，如下图：
 
 ![](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/iOS%E5%9F%BA%E7%A1%80/block/block%E5%8F%98%E9%87%8Fforwarding%E6%8C%87%E5%90%91.jpg?raw=true)
 
