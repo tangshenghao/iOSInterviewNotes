@@ -143,9 +143,15 @@ pop函数的入参就是push函数的返回值，也就是POOL_SENTINEL的内存
 
 根据官方的NSRunLoop的描述，每一个线程，包括主线程，都会拥有一个专属的NSRunLoop对象，会在需要的时候自动创建。
 
-同样在NSAutoreleasePool的描述中，我们知道，在主线程的NSRunLoop对象的每个event loop开始前，系统会自动创建一个autoreleasepool，并在event loop结束时drain。这也就是最开始时说的runloop迭代后会执行对象的release操作。
+同样在NSAutoreleasePool的描述中，我们知道，在主线程的NSRunLoop对象的每个event loop开始前，系统会自动创建一个autoreleasepool，并在event loop结束时drain，或者是在准备休眠时drain之后再创建一个。这也就是最开始时说的runloop迭代后会执行对象的release操作。
 
 另外，NSAutoreleasePool中还提到，每一个线程都会维护自己的AutoreleasePool的堆栈，这也说明AutoreleasePool是与线程密切相关的，从page中的属性也可以看出来，thread也就是对应的当前线程。
+
+在主线程中，系统会自动创建RunLoop，主线程中autorelease是由RunLoop的迭代来进行释放和创建的。
+
+如果子线程中，获取了RunLoop，系统会创建，之后就会和主线程一样，由RunLoop的迭代来处理。
+
+如果子线程没有获取RunLoop，没有创建。此时也用到了autorelease，系统会去执行autoreleaseNoPage的处理，创建一个page，并将其放到page中，到该子线程结束退出时会进行销毁。
 
 
 
