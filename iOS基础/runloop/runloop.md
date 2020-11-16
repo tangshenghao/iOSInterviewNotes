@@ -419,7 +419,7 @@ App启动之后，系统启动主线程并创建了RunLoop，在main thread中�
 上文中说的CFRunLoopTimerRef，其实NSTimer的原型就是CFRunLoopTimerRef。一个Timer注册RunLoop之后，RunLoop会为这个Timer的重复时间点注册好事件，有两点需要注意：
 
 - RunLoop为了节省资源，并不会在非常准确的时间点回调这个Timer。Timer有个属性叫做Tolerance宽容度，偏差度。标示了当时间点到后，容许的最大偏差。这个偏差默认为0，可以手动设置误差。无论设置值是多少，当前线程并不阻塞，系统依旧可能为在NSTimer上加上很小的容差。
-- 在哪个线程调用NSRTimer，就必须在哪个线程终止。
+- 在哪个线程调用NSTimer，就必须在哪个线程终止。
 
 还有RunLoop的Mode中也需要注意，在开发NSTimer实现图片轮播时，需要设置Mode为commonModes，不然会在滑动时，会停止轮播。
 
