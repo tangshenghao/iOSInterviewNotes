@@ -22,7 +22,7 @@ static StripedMap<SideTable>& SideTables() {
     return *reinterpret_cast<StripedMap<SideTable>*>(SideTableBuf);
 }
 
-// 然后在StripedMap的定义中可以知道最后都映射成64个
+// 然后在StripedMap的定义中可以知道最后都映射成8个或者64个
 // StripedMap<T> is a map of void* -> T, sized appropriately 
 // for cache-friendly lock striping. 
 // For example, this may be used as StripedMap<spinlock_t>
@@ -73,6 +73,8 @@ return ((addr >> 4) ^ (addr >> 9)) % StripeCount;
 作用是对当前SideTable加锁，避免数据读写错误。
 
 至于为什么采用自旋锁。因为自旋锁比较适用于锁使用者保持锁时间比较短的情况，不需要睡眠，因为操作SideTable很频繁，所以采用了较快的方式加锁。
+
+但其实spinlock_t在iOS10之后，因为优先级反转的问题，在源码的objc-os.h中spinlock_t对应的实际类型是mutex_tt，而mutex_tt的内部采用的是os_unfair_lock，不会忙等，会让线程休眠。
 
 
 
