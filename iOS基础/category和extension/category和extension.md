@@ -380,3 +380,25 @@ void *objc_destructInstance(id obj)
 }
 ```
 
+使用关联对象需要注意循环引用，因为在set关联对象时，会有objc_AssociationPolicy的枚举：
+
+```
+typedef OBJC_ENUM(uintptr_t, objc_AssociationPolicy) {
+    OBJC_ASSOCIATION_ASSIGN = 0,
+    OBJC_ASSOCIATION_RETAIN_NONATOMIC = 1,
+    OBJC_ASSOCIATION_COPY_NONATOMIC = 3,
+    OBJC_ASSOCIATION_RETAIN = 01401,
+    OBJC_ASSOCIATION_COPY = 01403
+};
+```
+
+分别对应assign，copy和retain以及是否原子性。当使用copy和retain时，会强引用对应的值。
+
+所以需要注意循环引用的处理。尽量避免循环引用的出现。
+
+如果使用OBJC_ASSOCIATION_ASSIGN可以避免循环引用，但是有可能出现野指针的问题，可以通过OBJC_ASSOCIATION_ASSIGN来实现weak的方式，因为在dealloc时会检查自身的关联对象对其内部进行释放。所以在对应的值dealloc时将消息传递回分类中，让分类将对应的key设置为nil即可。
+
+```
+objc_setAssociatedObject(object, key, nil, OBJC_ASSOCIATION_ASSIGN);
+```
+
