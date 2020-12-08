@@ -30,7 +30,7 @@ CMSampleBuffer即可以作为未解码前的数据的容器，可以用压缩的
 
 **CMVideoFormatDescription**：图像的存储方式，解码器等格式描述。
 
-**CMTime**：时间戳结构。时间以 64-big/32-bit形式出现。 分子是64-bit的时间值，分母是32-bit的时标(time scale)
+**CMTime**：时间戳结构。时间以 64-bit/32-bit形式出现。 分子是64-bit的时间值，分母是32-bit的时标(time scale)
 
 以下的是硬解码的主要接口说明：
 
