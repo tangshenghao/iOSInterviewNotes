@@ -23,10 +23,10 @@ runtime可以在运行时创建对象、检查对象，修改类和对象的方�
 在编译器阶段，编译器转换后会变成objc_msgSend(obj, foo)。然后到运行时，runtime执行的流程如下：
 
 1. 先通过实例obj的isa指针，找到obj的class类对象；
-2. 在class类对象中的objc_cache中查找是否有缓存的方法
+2. 在class类对象中的cache中查找是否有缓存的方法
 3. 如果没有缓存的方法，则去查找objc_method_list中的方法
 4. 如果没有找到对应的方法，则会继续往它的父类superclass中查找
-5. 如果找到了方法，将method_name作为key，method_imp作为value存到缓存中，以便下次不用再次到方法列表中查找
+5. 如果找到了方法，将sel的hash找到对应的下标，将sel、imp、cls作为bucket_t存到对应下标的value中，以便下次不用再次到方法列表中查找
 6. 有对应的IMP后，可以通过找到方法实现的函数。
 7. 如果没有找到则执行消息转发过程
 8. 如果消息转发也失败了，就会报出找不到方法的崩溃
@@ -60,27 +60,22 @@ typedef struct objc_object *id;
 然后接着看Class，class的定义是objc_class结构体
 
 ```
-struct objc_class {
-    Class _Nonnull isa  OBJC_ISA_AVAILABILITY;
+struct objc_class : objc_object {
+    // Class ISA;
+    Class superclass;
+    cache_t cache;             // formerly cache pointer and vtable
+    class_data_bits_t bits;    // class_rw_t * plus custom rr/alloc flags
 
-#if !__OBJC2__
-    Class _Nullable super_class                              OBJC2_UNAVAILABLE;
-    const char * _Nonnull name                               OBJC2_UNAVAILABLE;
-    long version                                             OBJC2_UNAVAILABLE;
-    long info                                                OBJC2_UNAVAILABLE;
-    long instance_size                                       OBJC2_UNAVAILABLE;
-    struct objc_ivar_list * _Nullable ivars                  OBJC2_UNAVAILABLE;
-    struct objc_method_list * _Nullable * _Nullable methodLists                    OBJC2_UNAVAILABLE;
-    struct objc_cache * _Nonnull cache                       OBJC2_UNAVAILABLE;
-    struct objc_protocol_list * _Nullable protocols          OBJC2_UNAVAILABLE;
-#endif
-
-} OBJC2_UNAVAILABLE;
+    class_rw_t *data() const {
+        return bits.data();
+    }
+    ......
+}
 ```
 
 通过对象的isa指针，找到了对应的类的结构体。
 
-方法调用时，通过结构体中的objc_method_list和objc_cache进行方法的查找。该类结构体中的方法为实例方法。
+方法调用时，通过结构体中的class_rw_t中objc_method_list和cache进行方法的查找。该类结构体中的方法为实例方法。
 
 
 
@@ -88,7 +83,7 @@ struct objc_class {
 
 而在类中，也有一个isa指向Class，此处指向元类，也就是类对象所属的类，其中结构体中的信息和类的信息类似，方法列表中存储的是类方法。
 
-比如，调用类方法时，流程是通过类的isa指针，找到元类，然后再通过元类的objc_method_list和objc_cache进行方法的查找。
+比如，调用类方法时，流程是通过类的isa指针，找到元类，然后再通过元类的class_rw_t中objc_method_list和cache进行方法的查找。
 
 
 
