@@ -68,7 +68,7 @@ return ((addr >> 4) ^ (addr >> 9)) % StripeCount;
 
 使用SideTables[key]来得到SideTable后，SideTable的结构如下：
 
-##### 1.2.1 一把自旋锁 spinlock_t slock;
+##### 1.2.1 一把锁 spinlock_t slock; （以前是自旋锁，现在是互斥锁）
 
 作用是对当前SideTable加锁，避免数据读写错误。
 
