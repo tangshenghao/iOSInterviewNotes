@@ -10,43 +10,34 @@ public class ListNode {
 }
 
 class Solution {
-    func reverseList(_ head: ListNode?) -> ListNode? {
-        
+    func detectCycle(_ head: ListNode?) -> ListNode? {
+        // 很奇怪找不到23题 leetcode找不到了
+        // 类似的在算法库里有一道 142. 环形链表 II
         if head == nil {
             return nil
         }
         
-        //用两个指针指，h1开始指向头节点，h2作为前一个节点
-        var h1 = head
-        var h2:ListNode? = nil
-        //如果h1的下一个节点不为空
-        while h1?.next != nil {
-            let tmp = h1?.next
-            h1?.next = h2
-            //两个指针向前移动
-            h2 = h1
-            h1 = tmp
+        // 快慢指针确定存在环
+        var fastNode = head
+        var slowNode = head
+        while fastNode?.next != nil && fastNode?.next?.next != nil {
+            fastNode = fastNode?.next?.next
+            slowNode = slowNode?.next
+            if fastNode === slowNode {
+                break
+            }
         }
-        //最后头节点要指回
-        h1?.next = h2
-        
-        return h1
-        
-        //此处是根据书本写的三个指针，分别指向前、中、后
-//        var preNode: ListNode? = nil
-//        var midNode = head
-//        var behindNode: ListNode? = nil
-//
-//        while midNode != nil {
-//            let tempNode = midNode?.next
-//            if tempNode == nil {
-//                behindNode = midNode
-//            }
-//            midNode?.next = preNode
-//            preNode = midNode
-//            midNode = tempNode
-//        }
-//        return behindNode
+        if fastNode?.next == nil || fastNode?.next?.next == nil {
+            return nil
+        }
+        // 将一个指针从头开始走 与当前相遇的位置的指针 同时按一步的频率向前走
+        // 再相遇的地方即为入口
+        fastNode = head
+        while fastNode !== slowNode {
+            fastNode = fastNode?.next
+            slowNode = slowNode?.next
+        }
+        return fastNode
     }
 }
 
@@ -61,8 +52,9 @@ nodeTwo.next = nodeThree
 nodeThree.next = nodeFour
 nodeFour.next = nodeFive
 nodeFive.next = nodeSix
+nodeSix.next = nodeFour
 
 let solution = Solution.init()
-let result = solution.reverseList(nodeOne)
+let result = solution.detectCycle(nodeOne)
 print("result = \(result?.val ?? -1)")
 
