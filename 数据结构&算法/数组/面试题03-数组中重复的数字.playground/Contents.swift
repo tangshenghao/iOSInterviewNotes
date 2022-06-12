@@ -1,41 +1,25 @@
 class Solution {
     func findRepeatNumber(_ nums: [Int]) -> Int {
-        var tempNums = nums
-        
-        for index in 0..<tempNums.count {
-            let value = tempNums[index]
-            if value == index {
-                //如果当前已经是对的位置则继续
-                continue
-            } else {
-                let result = replaceValueToRIndex(&tempNums, currentIndex: index)
-                if result == -1 {
-                    //如果交换后位置一致则继续
-                    continue
+        // 原地交换方式
+        var varNums = nums;
+        var index = 0
+        while index < varNums.count {
+            let value = varNums[index];
+            // 如果当前值不和下标一致
+            if value != index {
+                // 判断值是否已经在指定的位置上
+                if (varNums[value] == value) {
+                    // 重复将结果返回
+                    return value
                 } else {
-                    return result
+                    // 如果还没在指定位置上则交换
+                    varNums.swapAt(value, index)
                 }
+            } else {
+                index += 1
             }
         }
         return -1
-    }
-    
-    func replaceValueToRIndex(_ nums: inout [Int], currentIndex: Int) -> Int {
-        
-        let value = nums[currentIndex]
-        let temp = nums[value]
-        if value == temp {
-            //如果当前数和对应下标的数一致，则说明该数该数是一样的数
-            return value
-        } else {
-            nums[currentIndex] = temp
-            nums[value] = value
-            if temp == currentIndex {
-                return -1
-            } else {
-                return replaceValueToRIndex(&nums, currentIndex: currentIndex)
-            }
-        }
     }
 }
 
