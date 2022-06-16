@@ -12,18 +12,15 @@ class CQueue {
     }
     
     func deleteHead() -> Int {
-        if !list2.isEmpty {
+        if list2.count > 0 {
             return list2.removeLast()
+        } else {
+            while list1.count > 0 {
+                let list1Last = list1.removeLast()
+                list2.append(list1Last)
+            }
+            return list2.popLast() ?? -1
         }
-        
-        while !list1.isEmpty {
-            list2.append(list1.removeLast())
-        }
-        
-        if list2.isEmpty {
-            return -1
-        }
-        return list2.removeLast()
     }
 }
 
