@@ -12,47 +12,44 @@ public class TreeNode {
 
 class Solution {
     func buildTree(_ preorder: [Int], _ inorder: [Int]) -> TreeNode? {
-        
-        if preorder.count == 0 {
-            return nil
-        }
-        //用map来存储中序中的位置和值
-        var map = [Int : Int]()
-        for (i, value) in inorder.enumerated() {
-            map[value] = i
-        }
-        
-        var resultTreeNode = TreeNode.init(preorder[0])
-        self.findchildNodeTree(preorder, inorder, rootTreeNode: &resultTreeNode, preStart: 0, preEnd: preorder.count - 1, inStart: 0, inEnd: inorder.count - 1, map: map)
-        
-        return resultTreeNode
+        return buildTreeCore(0, preorder.count - 1, 0, inorder.count - 1, preorder, inorder)
     }
     
-    func findchildNodeTree(_ preorder: [Int], _ inorder: [Int], rootTreeNode : inout TreeNode, preStart: Int, preEnd: Int, inStart: Int, inEnd: Int, map: [Int: Int]) {
-        if preStart >= preEnd {
-            return
+    func buildTreeCore(_ preLeft: Int, _ preRight: Int, _ inLeft: Int, _ inRight: Int, _ preorder: [Int], _ inorder: [Int]) -> TreeNode? {
+        // 当仅有一个数时直接返回一个结点
+        if preLeft == preRight {
+            let node = TreeNode(preorder[preLeft])
+            return node
+        } else if preLeft > preRight || inLeft > inRight {
+            // 当位置超过时返回nil
+            return nil
+        }
+        // 前序第一个节点为根节点
+        let firstVal = preorder[preLeft]
+        let firstNode = TreeNode(firstVal)
+        
+        // 寻找中序中的根位置
+        var inLeftIndex = inLeft
+        var inMidIndex = -1
+        while inLeftIndex <= inRight {
+            if inorder[inLeftIndex] == firstVal {
+                inMidIndex = inLeftIndex
+                break
+            }
+            inLeftIndex += 1
+        }
+        if (inMidIndex == -1) {
+            return nil
         }
         
-        //根节点在中序中的下标
-        guard let rootIndex = map[preorder[preStart]] else { return }
-        //左部分长度
-        let leftCount = rootIndex - inStart
-        if leftCount > 0 {
-            //前序的最开始后的1位为左节点
-            var leftTreeNode = TreeNode.init(preorder[preStart + 1])
-            rootTreeNode.left = leftTreeNode
-            //将前序和中序的左部分位置传入继续递归
-            self.findchildNodeTree(preorder, inorder, rootTreeNode: &leftTreeNode, preStart: preStart + 1, preEnd: preStart + leftCount, inStart: inStart, inEnd: rootIndex - 1, map: map)
-        }
-        //右部分长度
-        let rightCount = inEnd - rootIndex
-        if rightCount > 0 {
-            //前序的右部分第一个为右节点
-            var rightTreeNode = TreeNode.init(preorder[preEnd - rightCount + 1])
-            rootTreeNode.right = rightTreeNode
-            //将前序和中序的右部分位置传入继续递归
-            self.findchildNodeTree(preorder, inorder, rootTreeNode: &rightTreeNode, preStart: preEnd - rightCount + 1, preEnd: preEnd, inStart: rootIndex + 1, inEnd: inEnd, map: map)
-        }
+        // 左部分递归
+        let leftNode = self.buildTreeCore(preLeft + 1, preLeft + (inMidIndex - inLeft), inLeft, inLeft + (inMidIndex - inLeft) - 1, preorder, inorder)
+        // 右部分递归
+        let rightNode = self.buildTreeCore(preRight - (inRight - inMidIndex) + 1, preRight, inRight - (inRight - inMidIndex) + 1 , inRight, preorder, inorder)
+        
+        firstNode.left = leftNode
+        firstNode.right = rightNode
+        return firstNode
     }
 }
 
