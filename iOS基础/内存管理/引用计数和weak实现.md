@@ -180,7 +180,7 @@ if (引用计数器 == table.refcnts.end()) {
     //标记对象为正在释放
     table.refcnts[this] = SIDE_TABLE_DEALLOCATING;
 } else if (引用计数器 < SIDE_TABLE_DEALLOCATING) {
-    //这里很有意思，当出现小余(1UL<<1) 的情况的时候
+    //这里很有意思，当出现小于(1UL<<1) 的情况的时候
     //就是前面引用计数位都是0,后面弱引用标记位WEAKLY_REFERENCED可能有弱引用1
     //或者没弱引用0
 
