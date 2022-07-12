@@ -39,7 +39,7 @@ struct __CFRunLoop {
 
 > CFRunLoop对象可以检测某个task或者dispatch的输入事件，当检测到有输入源事件，CFRunLoop将会将其加入到线程中进行处理。比方说用户输入事件、网络连接事件、周期性或者延时事件、异步的回调等。
 >
-> RunLoop可以检测的事件类型一共有3˙种，分别是CFRunLoopSource、CFRunLoopTimer、CFRunLoopObserver。可以通过CFRunLoopAddSrouce、CFRunLoopAddTimer或者CFRunLoopAddObserver添加相应的事件类型。
+> RunLoop可以检测的事件类型一共有3种，分别是CFRunLoopSource、CFRunLoopTimer、CFRunLoopObserver。可以通过CFRunLoopAddSrouce、CFRunLoopAddTimer或者CFRunLoopAddObserver添加相应的事件类型。
 >
 > 要让一个RunLoop跑起来还需要run loop modes，每一个source，timer和observer添加到RunLoop中时必须要与一个模式（CFRunLoopMode）相关联才可以运行。
 
