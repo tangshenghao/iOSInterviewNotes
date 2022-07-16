@@ -190,9 +190,7 @@ function doSomeThing() {
 
 ##### 2.1.5 WKScriptMessageHandle协议
 
-使用该协议需要在WKUserContentController中添加方法。同时不能实现
-
-同步返回功能。需要注意循环引用的问题，需要在退出前移除挂载的方法。
+使用该协议需要在WKUserContentController中添加方法，同时不能实现同步返回功能，需要注意循环引用的问题，需要在退出前移除挂载的方法。
 
 原生代码实现如下：
 
@@ -416,4 +414,4 @@ console.error = (
 )(console.error);
 ```
 
-这样实现之后，原本H5项目中的代码可以不进行修改。只需要原生将UIWebView的逻辑换成WKWebview来实现，并且插入上述JS内容即可。
+这样实现之后，原本H5项目中的代码可以不进行修改，只需要原生将UIWebView的逻辑换成WKWebview来实现，并且插入上述JS内容即可。
