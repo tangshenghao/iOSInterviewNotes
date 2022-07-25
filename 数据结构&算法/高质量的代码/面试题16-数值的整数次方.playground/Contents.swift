@@ -1,9 +1,9 @@
 class Solution {
     func myPow(_ x: Double, _ n: Int) -> Double {
         
-        //如果n是偶数，则a的n次方等于a的n-2次方再乘以a的n-2次方
-        //如果n是奇数，则a的n次方等于a的n-1次方再乘以a的n-1次方再乘以n
-        //例如求32次方，只需要计算5次乘法（2、4、8、16、32）
+        // 如果n是偶数，则a的n次方等于a的n/2次方再乘以a的n/2次方，比如2^4 = 2^2 * 2^2
+        // 如果n是奇数，则a的n次方等于a的n/2次方再乘以a的n/2次方再乘以n，比如 2^5 = 2^2 * 2^2 * 2
+        // 例如求32次方，只需要计算5次乘法（2、4、8、16、32）
         
         if x == 0 {
             return 0
@@ -15,16 +15,16 @@ class Solution {
             return x
         }
         var result = x
-        //处理负数
+        // 处理负数
         if n < 0 {
            return myPow(1 / x, -n)
         }
         
-        //右移动一位相当于/2 效率会比除法快
+        // 右移动一位相当于/2 效率会比除法快
         result = myPow(x, n >> 1)
         // 结果相乘
         result *= result
-        //判断是否是奇数 则但乘n
+        // 判断是否是奇数 则但乘n
         if n & 0x1 > 0 {
             result *= x
         }
