@@ -48,11 +48,11 @@ mach_port_insert_right：将指定的端口插入目标task
 
 捕获方式如下图：
 
-![]()
+![](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/%E6%80%A7%E8%83%BD%E6%B2%BB%E7%90%86/Crash/crash1.png?raw=true)
 
 主要的流程是：新建一个监控线程，在监控线程中监听Mach异常并处理异常信息，步骤如下图：
 
-![]()
+![](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/%E6%80%A7%E8%83%BD%E6%B2%BB%E7%90%86/Crash/crash2.png?raw=true)
 
 具体代码如下：
 
@@ -512,7 +512,7 @@ void __cxa_throw(void* thrown_exception, std::type_info* tinfo, void (*dest)(voi
 
 如下图：
 
-![]()
+![](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/%E6%80%A7%E8%83%BD%E6%B2%BB%E7%90%86/Crash/crash3.png?raw=true)
 
 1. 如果是NSException类型的异常
 

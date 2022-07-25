@@ -68,6 +68,10 @@ iOS面试的准备、知识点的积累
 * [避免崩溃](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/iOS%E8%BF%9B%E9%98%B6/%E9%81%BF%E5%85%8D%E5%B4%A9%E6%BA%83/%E9%81%BF%E5%85%8D%E5%B4%A9%E6%BA%83.md)
 * [内存泄漏检测](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/iOS%E8%BF%9B%E9%98%B6/%E6%A3%80%E6%B5%8B%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F/%E6%A3%80%E6%B5%8B%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F.md)
 
+## 性能治理
+
+- [Crash](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/%E6%80%A7%E8%83%BD%E6%B2%BB%E7%90%86/Crash/Crash.md)
+
 ## 音视频相关
 
 * [视频H264编解码基础知识](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/%E9%9F%B3%E8%A7%86%E9%A2%91%E7%9B%B8%E5%85%B3/%E8%A7%86%E9%A2%91H264%E7%BC%96%E8%A7%A3%E7%A0%81%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86.md)
