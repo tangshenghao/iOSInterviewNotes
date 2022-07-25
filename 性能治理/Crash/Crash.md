@@ -14,7 +14,7 @@
 
 应用级异常，它是未被捕获的Objective-C异常，导致程序向自身发送了SIGABRT信号而崩溃，是app自己可控的，对于未捕获的OC异常，可以通过try catch来捕获或者通过NSSetUncaughtExceptionHandler()机制来捕获。
 
-
+<br />
 
 #### 1.1 Mach异常
 
@@ -42,7 +42,7 @@ mach_port_allocate：创建调用者指定的端口权限类型
 
 mach_port_insert_right：将指定的端口插入目标task
 
-
+<br />
 
 ##### 1.1.2 如果捕获Mach异常
 
@@ -256,7 +256,7 @@ static void *exc_handler(void *ignored) {
 
 避免在Xcode联调时监听，因为监听了类型的Exception，一旦启动app联调后，会立即触发EXC_BREAKPOINT，而这段代码处理完之后，会进入下一个循环等待，主线程也会等待消息处理结果，会造成死锁。
 
-
+<br />
 
 #### 1.2 Unit信号
 
@@ -314,7 +314,7 @@ Unix Signal其实是由Mach port抛出的信号转化。
 
 可以参考[linux各个SIG信号含义](https://blog.csdn.net/weixin_42568866/article/details/89485722)
 
-
+<br />
 
 ##### 1.2.2 捕捉Unix信号
 
@@ -363,7 +363,7 @@ void handleSignalException(int signal) {
 }
 ```
 
-
+<br />
 
 ##### 1.2.3 备用信号栈
 
@@ -396,7 +396,7 @@ void installSignalHandler() {
 }
 ```
 
-  
+ <br />
 
 #### 1.3 NSException
 
@@ -443,7 +443,7 @@ NSMutableDictionary *info = method return to NSDictionary type;
 
 调用方法未找到
 
-
+<br />
 
 ##### 1.3.2 监听NSException异常
 
@@ -462,7 +462,7 @@ void handleUncaughtException(NSException *exception) {
 
 需要注意的是，在监听处理的方法中，是无法直接采集错误堆栈的。
 
-
+<br />
 
 #### 1.4 C++异常
 
@@ -506,7 +506,7 @@ void __cxa_throw(void* thrown_exception, std::type_info* tinfo, void (*dest)(voi
 
 `__cxa_throw`往后执行，进入set_terminate设置的异常处理函数，判断如果检测是OC异常，则不处理，否则获取异常信息。
 
-
+<br />
 
 ### 2 Crash的处理顺序
 
@@ -523,6 +523,8 @@ void __cxa_throw(void* thrown_exception, std::type_info* tinfo, void (*dest)(voi
 app如果处理了mach异常则进入处理流程，否则mach异常会被转为Unix/BSD signal信号，并进入Signal的处理流程
 
 过程就是NSException -> Mach -> Signal
+
+<br />
 
 #### 2.1 不同类型异常的关系和处理决策
 
@@ -544,13 +546,13 @@ app如果处理了mach异常则进入处理流程，否则mach异常会被转为
 
    这是因为Mach异常会更早的抛出来，而且如果Mach异常的handle让程序exit了，那么Unix信号就永远不会到达这个进程了。
 
-
+<br />
 
 ##### 2.1.2 为什么不能只监听Mach Exception
 
 进程中监听Mach Exception，在EXC_Crash发生的时候，表示进程非正常退出，任何其他任务都不会被执行，所以Mach Exception handler不会执行。类似abort()的方法只会触发signal信号，不会触发hardware trap，所以需要监听Signal信号。
 
-
+<br />
 
 ##### 2.1.3 Mach Exception和Signal的转换关系
 
@@ -567,13 +569,13 @@ app如果处理了mach异常则进入处理流程，否则mach异常会被转为
 | SIGABRT    | EXC_CRASH            |
 | SIGKILL    | EXC_SOFT_SIGNAL      |
 
-
+<br />
 
 ##### 2.1.4 为什么要实现NSException监听
 
 前面所说，通过Mach/Signal已经可以监听大部分的崩溃场景了，那为何我们还要实现NSException监听呢？原因是未被try-catch的NSException会发出kill或者pthread_kill信号->Mach异常->Unix信号（SIGABRT），但是SIGABRT在处理信息时，获取不到当前的堆栈，所以采用NSSetUncaughtExceptionHandler。
 
-
+<br />
 
 ### 3 捕获Swift崩溃
 
@@ -593,7 +595,7 @@ swift通常都是通过对应的signal来捕获crash，对于swift崩溃捕获�
 >  该过程尝试执行非法或未定义的指令。该过程可能尝试通过错误配置的函数指针跳转到无效地址。
 >  在Intel处理器上，ud2操作码引起EXC_BAD_INSTRUCTION异常，但通常用于进程调试目的。如果在运行时遇到意外情况，Intel处理器上的Swift代码将以此异常类型终止。有关详细信息，请参阅Trace Trap。
 
-
+<br />
 
 ### 4 解除监听
 
@@ -608,3 +610,4 @@ signal(SIGHUP, SIG_DFL);
 
 1. 保证一个Crash只会被一个Hander处理，避免多次处理
 2. 防止出现死锁导致应用不能退出
+
