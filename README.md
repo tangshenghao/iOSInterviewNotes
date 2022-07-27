@@ -71,6 +71,7 @@ iOS面试的准备、知识点的积累
 ## 性能治理
 
 - [Crash](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/%E6%80%A7%E8%83%BD%E6%B2%BB%E7%90%86/Crash/Crash.md)
+- [内存](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/%E6%80%A7%E8%83%BD%E6%B2%BB%E7%90%86/%E5%86%85%E5%AD%98/%E5%86%85%E5%AD%98.md)
 
 ## 音视频相关
 
