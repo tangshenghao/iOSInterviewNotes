@@ -72,6 +72,7 @@ iOS面试的准备、知识点的积累
 
 - [Crash](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/%E6%80%A7%E8%83%BD%E6%B2%BB%E7%90%86/Crash/Crash.md)
 - [内存](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/%E6%80%A7%E8%83%BD%E6%B2%BB%E7%90%86/%E5%86%85%E5%AD%98/%E5%86%85%E5%AD%98.md)
+- [卡顿](https://github.com/tangshenghao/iOSInterviewNotes/blob/master/%E6%80%A7%E8%83%BD%E6%B2%BB%E7%90%86/%E5%8D%A1%E9%A1%BF/%E5%8D%A1%E9%A1%BF.md)
 
 ## 音视频相关
 
